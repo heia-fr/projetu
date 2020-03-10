@@ -6,7 +6,7 @@ build-kaniko:
   only:
     - tags
   image:
-    name: 'gcr.io/kaniko-project/executor:latest'
+    name: 'gcr.io/kaniko-project/executor:debug'
     entrypoint:
       - ''
   script:
