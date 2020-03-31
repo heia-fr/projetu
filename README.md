@@ -31,7 +31,9 @@ Voici la marche à suivre pour proposer des projets:
   ---
   ## Contexte
 
-  Sit sint sit adipisicing excepteur cillum ullamco velit qui fugiat   occaecat. Voluptate aliqua ex commodo aliqua commodo exercitation quis   minim exercitation qui minim dolor. 
+  Sit sint sit adipisicing excepteur cillum ullamco velit qui fugiat
+  occaecat. Voluptate aliqua ex commodo aliqua commodo exercitation quis
+  minim exercitation qui minim dolor. 
   
   ## Objectifs
 
