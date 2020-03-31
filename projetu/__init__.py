@@ -1,16 +1,17 @@
+import logging
 import os
+import shutil
+import subprocess
 import tempfile
 from pathlib import Path
-from pykwalify.core import Core
 
 import click
 import jinja2
 import yaml
-import subprocess
-import shutil
-import logging
+from pykwalify.core import Core
 
 MARK = '---'
+
 
 def process(template_file, author, config, input_file):
     meta = ""
@@ -35,12 +36,14 @@ def process(template_file, author, config, input_file):
     basedir = Path(__file__).parent
     data = dict()
     meta_map = yaml.load(meta, Loader=yaml.FullLoader)
-    Core(source_data=meta_map, schema_files=[str(basedir/"schemas/meta.yml")]).validate()
+    Core(source_data=meta_map, schema_files=[
+         str(basedir/"schemas/meta.yml")]).validate()
     data['meta'] = meta_map
     if config is not None:
         config_map = yaml.load(config, Loader=yaml.FullLoader)
         data['config'] = config_map
-        Core(source_data=config_map, schema_files=[str(basedir/"schemas/config.yml")]).validate()
+        Core(source_data=config_map, schema_files=[
+             str(basedir/"schemas/config.yml")]).validate()
     else:
         data['config'] = dict()
     data['author'] = author
@@ -91,7 +94,7 @@ def process(template_file, author, config, input_file):
     tmp_tex.close()
 
     logging.debug("Running pandoc")
-    cmd=[
+    cmd = [
         "pandoc",
         tmp_md.name,
         "--from", "markdown+link_attributes+raw_tex",
@@ -122,7 +125,7 @@ def process(template_file, author, config, input_file):
 
     logging.debug("Running xelatex")
     with tempfile.TemporaryDirectory(dir=".") as tmp_dir:
-        cmd=[
+        cmd = [
             "xelatex",
             "-halt-on-error",
             "-quiet",
@@ -131,7 +134,7 @@ def process(template_file, author, config, input_file):
             f"-jobname={stem}",
             tmp_tex.name,
         ]
-        
+
         logging.debug("Run 1")
         res = subprocess.call(cmd)
         if res != 0:
@@ -141,12 +144,13 @@ def process(template_file, author, config, input_file):
         res = subprocess.call(cmd)
         if res != 0:
             raise Exception("Error running xelatex")
-        
+
         logging.debug("Renaming PDF")
         shutil.move(Path(tmp_dir) / f"{stem}.pdf", f"{stem}.pdf")
 
     os.unlink(tmp_md.name)
     os.unlink(tmp_tex.name)
+
 
 @click.command()
 @click.option('--template', 'template_file', type=click.Path(), default="project.md", help='Template')
@@ -165,6 +169,7 @@ def cli(template_file, author, config, debug, input_files):
         logging.info("Processing %s", i.name)
         config.seek(0)
         process(template_file, author, config, i)
+
 
 if __name__ == "__main__":
     cli()
