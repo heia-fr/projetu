@@ -1,0 +1,6 @@
+type: map
+mapping:
+  "type":
+    type:      str
+    required:  yes
+ 

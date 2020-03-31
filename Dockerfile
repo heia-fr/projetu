@@ -29,5 +29,6 @@ RUN fc-cache -f -v
 WORKDIR /app
 COPY projetu /app/projetu
 COPY setup.py /app
+COPY *.yml /app
 
 RUN pip3 install .
