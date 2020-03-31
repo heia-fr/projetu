@@ -42,7 +42,6 @@ Voici la marche à suivre pour proposer des projets:
   - Consectetuer
   - Adipiscing elit
 
-  
   ## Contraintes
 
   - Diam
