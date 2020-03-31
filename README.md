@@ -69,7 +69,7 @@ build:
     paths:
       - ./*.pdf
 ```
-  - A chaque fois que vous ferez un `git commit` et que vous enverrez les changements sur gitlab (avec un `git push`), le CI/CD de gitlab produira les PDFs correspondants à vous fichiers. Assurez-vous que la compilation n'ait pas produit d'erreur.
+  - A chaque fois que vous ferez un `git commit` et que vous enverrez les changements sur gitlab (avec un `git push`), le CI/CD de gitlab produira les PDFs correspondants à vous fichiers. Assurez-vous que la compilation ne produise pas d'erreur.
   
 # Exemple
 
