@@ -65,8 +65,8 @@ image: "registry.forge.hefr.ch/jacques.supcik/projetu:latest"
 
 build:
   script:
-    ls *.md | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=ps.md --config /app/ps6-2019-2020.yml
-    artifacts:
+    ls *.md | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb.md --config /app/tb-2019-2020.yml
+  artifacts:
     paths:
       - ./*.pdf
 ```
