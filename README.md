@@ -8,7 +8,7 @@ Système de publication des projets d'étudiants (projets de semestre et travaux
 Voici la marche à suivre pour proposer des projets:
 
 - Créer un projet sur https://gitlab.forge.hefr.ch/, dans votre "namespace" (prénom.nom), avec le nom communiqué par le responsable de filière (par exemple `ps6-2019-2020`). Le projet peut être _public_, _internal_, ou alors _private_, mais dans ce dernier cas, le responsable de filière doit être ajouté aux membres du projet avec le rôle de _reporter_ (ou plus).
-- Pour chaque projet, rédiger un fichier avec l'extension `.md`. Ce fichier se compose de deux parties:
+- Pour chaque projet, rédiger un fichier **avec l'extension `.md`**. Ce fichier se compose de deux parties:
   - Un "front matter" en _YAML_ avec les méta données du projet. Cette partie doit respecter le schéma [Kwalify](http://www.kuwata-lab.com/kwalify/) suivant : https://gitlab.forge.hefr.ch/jacques.supcik/projetu/-/blob/master/projetu/schemas/meta.yml
   - La donnée du projet en markdown avec des sections telles que "Contexte", "Objectifs", "Contraintes".
   
