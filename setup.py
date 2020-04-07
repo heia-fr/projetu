@@ -20,6 +20,6 @@ setup(
     zip_safe=False,
     entry_points='''
         [console_scripts]
-        projetu=projetu:cli
+        projetu=projetu.standalone:cli
     ''',
 )

@@ -1,175 +1,199 @@
+import io
 import logging
 import os
 import shutil
 import subprocess
 import tempfile
+from dataclasses import dataclass, field
 from pathlib import Path
 
-import click
 import jinja2
 import yaml
 from pykwalify.core import Core
 
 MARK = '---'
+@dataclass
+class Projetu:
+    template_file: str
+    author: str
+    config_file: io.FileIO
+    base_dir: Path = field(init=False)
+    config_map: dict = field(init=False)
 
+    def __post_init__(self):
+        self.base_dir = Path(__file__).parent
+        self.config_map = dict()
+        if self.config_file is not None:
+            self.config_map = yaml.load(
+                self.config_file, Loader=yaml.FullLoader)
+            Core(source_data=self.config_map, schema_files=[
+                str(self.base_dir/"schemas/config.yml")]).validate()
 
-def process(template_file, author, config, input_file):
-    meta = ""
-    body = ""
+    def mark_down(self, input_file):
+        meta = ""
+        body = ""
 
-    l = input_file.readline()
-    mark = l.strip()
-    if not mark == MARK:
-        raise Exception(f"Invalid header. The file must start with {MARK}")
-
-    meta = ""
-    l = input_file.readline()
-    while l != "" and l.strip() != mark:
-        meta += l
         l = input_file.readline()
+        mark = l.strip()
+        if not mark == MARK:
+            raise Exception(f"Invalid header. The file must start with {MARK}")
 
-    l = input_file.readline()
-    while l != "":
-        body += l
+        meta = ""
         l = input_file.readline()
+        while l != "" and l.strip() != mark:
+            meta += l
+            l = input_file.readline()
 
-    basedir = Path(__file__).parent
-    data = dict()
-    meta_map = yaml.load(meta, Loader=yaml.FullLoader)
-    Core(source_data=meta_map, schema_files=[
-         str(basedir/"schemas/meta.yml")]).validate()
-    data['meta'] = meta_map
-    if config is not None:
-        config_map = yaml.load(config, Loader=yaml.FullLoader)
-        data['config'] = config_map
-        Core(source_data=config_map, schema_files=[
-             str(basedir/"schemas/config.yml")]).validate()
-    else:
-        data['config'] = dict()
-    data['author'] = author
-    data['basedir'] = basedir.resolve()
-    data['body'] = body
+        l = input_file.readline()
+        while l != "":
+            body += l
+            l = input_file.readline()
 
-    env = jinja2.Environment(
-        block_start_string='\BLOCK{',
-        block_end_string='}',
-        variable_start_string='\VAR{',
-        variable_end_string='}',
-        comment_start_string='\#{',
-        comment_end_string='}',
-        line_statement_prefix='%%',
-        line_comment_prefix='%#',
-        trim_blocks=True,
-        autoescape=jinja2.select_autoescape(
-            enabled_extensions=('html', 'xml'),
-            default_for_string=True,
-        ),
-        loader=jinja2.PackageLoader(__package__)
-    )
+        data = dict()
+        meta_map = yaml.load(meta, Loader=yaml.FullLoader)
+        Core(source_data=meta_map, schema_files=[
+            str(self.base_dir/"schemas/meta.yml")]).validate()
 
-    template = env.get_template(template_file)
-    rendered_data = template.render(data)
-    tmp_md = tempfile.NamedTemporaryFile(
-        dir=".",
-        mode="wt",
-        prefix="doc-",
-        suffix=".tmp.md",
-        delete=False
-    )
-    tmp_md.write(rendered_data)
-    tmp_md.close()
+        data['meta'] = meta_map
+        data['config'] = self.config_map
+        data['author'] = self.author
+        data['basedir'] = self.base_dir.resolve()
+        data['body'] = body
 
-    logging.debug('---------- BEGIN RENDERED DATA ----------')
-    for l in rendered_data.splitlines():
-        logging.debug(l)
-    logging.debug('---------- END RENDERED DATA ----------')
+        env = jinja2.Environment(
+            block_start_string='\BLOCK{',
+            block_end_string='}',
+            variable_start_string='\VAR{',
+            variable_end_string='}',
+            comment_start_string='\#{',
+            comment_end_string='}',
+            line_statement_prefix='%%',
+            line_comment_prefix='%#',
+            trim_blocks=True,
+            autoescape=jinja2.select_autoescape(
+                enabled_extensions=('html', 'xml'),
+                default_for_string=True,
+            ),
+            loader=jinja2.PackageLoader(__package__)
+        )
 
-    tmp_tex = tempfile.NamedTemporaryFile(
-        dir=".",
-        mode="wt",
-        prefix="doc-",
-        suffix=".tmp.tex",
-        delete=False
-    )
-    tmp_tex.close()
+        template = env.get_template(self.template_file)
+        rendered_data = template.render(data)
 
-    logging.debug("Running pandoc")
-    cmd = [
-        "pandoc",
-        tmp_md.name,
-        "--from", "markdown+link_attributes+raw_tex",
-        "-t", "latex",
-        f"--resource-path", f".:{Path(__file__).parent / 'resources'}",
-        "--include-in-header", basedir/"resources"/"chapter_break.tex",
-        "--include-in-header", basedir/"resources"/"bullet_style.tex",
-        "-V", "linkcolor:blue",
-        "-V", "geometry:a4paper",
-        "-V", "geometry:margin=2cm",
-        "-V", "mainfont=\"IBMPlexSans\"",
-        "-V", "monofont=\"IBMPlexMono\"",
-        "--pdf-engine=xelatex",
-        "--standalone",
-        "-o", tmp_tex.name,
-    ]
-    res = subprocess.call(cmd)
-    if res != 0:
-        raise Exception("Error running Pandoc")
+        logging.debug('---------- BEGIN RENDERED DATA ----------')
+        for l in rendered_data.splitlines():
+            logging.debug(l)
+        logging.debug('---------- END RENDERED DATA ----------')
 
-    logging.debug('---------- BEGIN LATEX ----------')
-    with open(tmp_tex.name) as f:
-        for l in f:
-            logging.debug(l.strip())
-    logging.debug('---------- END LATEX ----------')
+        return io.StringIO(rendered_data)
 
-    stem = Path(input_file.name).stem
+    def run_pandoc(self, markdown, tmp_dir="."):
 
-    logging.debug("Running xelatex")
-    with tempfile.TemporaryDirectory(dir=".") as tmp_dir:
+        tmp_md = tempfile.NamedTemporaryFile(
+            dir=tmp_dir,
+            mode="wt",
+            prefix="doc-",
+            suffix=".tmp.md",
+            delete=False
+        )
+        tmp_md.write(markdown.read())
+        tmp_md.close()
+
+        tmp_tex = tempfile.NamedTemporaryFile(
+            dir=tmp_dir,
+            mode="wt",
+            prefix="doc-",
+            suffix=".tmp.tex",
+            delete=False
+        )
+        tmp_tex.close()
+
+        logging.debug("Running pandoc")
         cmd = [
-            "xelatex",
-            "-halt-on-error",
-            "-quiet",
-            f"-output-directory={tmp_dir}",
-            "-interaction=nonstopmode",
-            f"-jobname={stem}",
-            tmp_tex.name,
+            "pandoc",
+            tmp_md.name,
+            "--from", "markdown+link_attributes+raw_tex",
+            "-t", "latex",
+            f"--resource-path", f".:{Path(__file__).parent / 'resources'}",
+            "--include-in-header", self.base_dir/"resources"/"silence.tex",
+            "--include-in-header", self.base_dir/"resources"/"chapter_break.tex",
+            "--include-in-header", self.base_dir/"resources"/"bullet_style.tex",
+            "-V", "linkcolor:blue",
+            "-V", "geometry:a4paper",
+            "-V", "geometry:margin=2cm",
+            "-V", "mainfont=\"IBMPlexSans\"",
+            "-V", "monofont=\"IBMPlexMono\"",
+            "--pdf-engine=xelatex",
+            "--standalone",
+            "-o", tmp_tex.name,
         ]
-
-        logging.debug("Run 1")
         res = subprocess.call(cmd)
         if res != 0:
-            raise Exception("Error running xelatex")
+            raise Exception("Error running Pandoc")
 
-        logging.debug("Run 2")
-        res = subprocess.call(cmd)
-        if res != 0:
-            raise Exception("Error running xelatex")
+        os.unlink(tmp_md.name)
 
-        logging.debug("Renaming PDF")
-        shutil.move(Path(tmp_dir) / f"{stem}.pdf", f"{stem}.pdf")
+        logging.debug('---------- BEGIN LATEX ----------')
+        with open(tmp_tex.name) as f:
+            for l in f:
+                logging.debug(l.strip())
+        logging.debug('---------- END LATEX ----------')
 
-    os.unlink(tmp_md.name)
-    os.unlink(tmp_tex.name)
+        with open(tmp_tex.name) as f:
+            res = io.StringIO(f.read())
+        os.unlink(tmp_tex.name)
 
+        return res
 
-@click.command()
-@click.option('--template', 'template_file', type=click.Path(), default="project.md", help='Template')
-@click.option('--author', type=str, default="PLEASE, SET AUTHOR")
-@click.option('--config', type=click.File('r'), default=None)
-@click.option('--debug/--no-debug')
-@click.argument('input_files', type=click.File('r'), nargs=-1)
-def cli(template_file, author, config, debug, input_files):
+    def run_latex(self, tex_file, stem, directory="."):
+        logging.debug("Running xelatex")
 
-    if debug:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
+        tmp_tex = tempfile.NamedTemporaryFile(
+            dir=directory,
+            mode="wt",
+            prefix="doc-",
+            suffix=".tmp.tex",
+            delete=False
+        )
+        tmp_tex.write(tex_file.read())
+        tmp_tex.close()
 
-    for i in input_files:
-        logging.info("Processing %s", i.name)
-        config.seek(0)
-        process(template_file, author, config, i)
+        with tempfile.TemporaryDirectory(dir=directory) as tmp_dir:
+            cmd = [
+                "xelatex",
+                "-halt-on-error",
+                f"-output-directory={tmp_dir}",
+                "-interaction=batchmode",
+                f"-jobname={stem}",
+                tmp_tex.name,
+            ]
 
+            for i in range(2):
+                logging.debug(f"Run {i}")
+                res = subprocess.call(cmd)
+                if res != 0:
+                    logging.error("Error processing tex file")
+                    logging.error('---------- BEGIN LATEX ----------')
+                    with open(tmp_tex.name) as f:
+                        for line, l in enumerate(f):
+                            logging.error("TEX %5d > %s", line, l.strip())
+                    logging.error('---------- END LATEX ----------')
+                    logging.error('---------- BEGIN LOG ----------')
+                    with open(Path(tmp_dir)/f"{stem}.log") as f:
+                        for line, l in enumerate(f):
+                            logging.error("LOG %5d > %s", line, l.strip())
+                    logging.error('---------- END LOG ----------')
+                    raise Exception("Error running xelatex")
 
-if __name__ == "__main__":
-    cli()
+            os.unlink(tmp_tex.name)
+            with open(Path(tmp_dir) / f"{stem}.pdf", "rb") as f:
+                return io.BytesIO(f.read())
+
+    def process(self, input_file):
+        stem = Path(input_file.name).stem
+        rendered_data = self.mark_down(input_file)
+        tex_file = self.run_pandoc(rendered_data)
+        pdf_file = self.run_latex(tex_file, stem)
+        logging.debug("Saving PDF")
+        with open(f"{stem}.pdf", "wb") as f:
+            f.write(pdf_file.read())
