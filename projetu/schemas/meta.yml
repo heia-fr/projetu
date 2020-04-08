@@ -26,11 +26,13 @@ mapping:
           - Réseaux et sécurité
     required: no
   langue:
-    type: str
-    enum:
-      - D
-      - F
-      - E
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - D
+          - F
+          - E
     required: yes
   professeurs co-superviseurs:
     type: seq

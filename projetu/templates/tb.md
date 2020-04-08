@@ -17,6 +17,9 @@
 \BLOCK{ if meta.mandants }
 - Mandant(s) : \VAR{ meta.mandants | join(", ") }
 \BLOCK{ endif }
+\BLOCK{ if meta["confidentialité"] == "oui" }
+- **Projet confidentiel**
+\BLOCK{ endif }
 \BLOCK{ if meta["proposé par étudiant"] }
 - Proposé par : \VAR{ meta["proposé par étudiant"] }
 \BLOCK{ endif }
@@ -30,7 +33,7 @@
 - Instituts(s) : \VAR{ meta.instituts | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ if meta.langue }
-- Langue : \VAR{ meta.langue }
+- Langue : \VAR{ meta.langue | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ if meta["nombre d'étudiants"] }
 - Nombre maximum d'étudiant(s) : \VAR{ meta["nombre d'étudiants"] }
@@ -44,6 +47,9 @@
 \BLOCK{ endif }
 \BLOCK{ if meta.assistants }
 - Assistants: \VAR{ meta.assistants | join(", ") }
+\BLOCK{ endif }
+\BLOCK{ if meta.suite == "oui" }
+- Ce projet de bachelor est la suite d'un travail de semestre réalisée par le même étudiant
 \BLOCK{ endif }
 
 \BLOCK{ if meta["mots-clé"] }
