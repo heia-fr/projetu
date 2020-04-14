@@ -30,7 +30,7 @@
 - Instituts(s) : \VAR{ meta.instituts | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ if meta.langue }
-- Langue : \VAR{ meta.langue }
+- Langue : \VAR{ meta.langue | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ if meta["nombre d'étudiants"] }
 - Nombre maximum d'étudiant(s) : \VAR{ meta["nombre d'étudiants"] }

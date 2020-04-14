@@ -25,7 +25,7 @@ Voici la marche à suivre pour proposer des projets:
   professeurs co-superviseurs:
     - Philippe Joye
   mots-clé: [IoT, Réseaux, Machine Learning]
-  langue: F
+  langue: [F]
   confidentialité: non
   suite: non
   ---

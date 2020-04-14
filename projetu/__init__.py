@@ -136,6 +136,7 @@ class Projetu:
         ]
         if standalone:
             cmd += [
+                "--include-in-header", self.base_dir/"resources"/"wrapfig.tex",
                 "--include-in-header", self.base_dir/"resources"/"silence.tex",
                 "--include-in-header", self.base_dir/"resources"/"chapter_break.tex",
                 "--include-in-header", self.base_dir/"resources"/"bullet_style.tex",
