@@ -3,7 +3,7 @@ import logging
 import click
 
 from . import Projetu
-
+from pathlib import Path
 
 @click.command()
 @click.option('--template', 'template_file', type=click.Path(), default="project.md", help='Template')
@@ -22,7 +22,13 @@ def cli(template_file, author, config, debug, input_files):
 
     for i in input_files:
         logging.info("Processing %s", i.name)
-        p.process(i)
+        stem = Path(i.name).stem
+        rendered_data = p.mark_down(i)
+        tex_file = p.run_pandoc(rendered_data)
+        pdf_file = p.run_latex(tex_file, stem)
+        logging.debug("Saving PDF")
+        with open(f"{stem}.pdf", "wb") as f:
+            f.write(pdf_file.read())
 
 
 if __name__ == "__main__":
