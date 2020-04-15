@@ -82,7 +82,17 @@ mapping:
       - étranger
       - instituts externe
     required: no
-  mots-clé:
+  mots-clés: # new in v0.0.8
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  mots-clé: # deprecated
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  attribué à:
     type: seq
     sequence:
       - type: str

@@ -9,6 +9,7 @@
 \usepackage{ifxetex,ifluatex}
 \usepackage{babel}
 \usepackage{import}
+\usepackage{makeidx}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -87,8 +88,10 @@ pdfcreator={LaTeX via pandoc}}
 
 \date{}
 \setcounter{tocdepth}{1}
+\makeindex
 
 \begin{document}
+\renewcommand\indexname{Mots-clés}
 \thispagestyle{empty}
 \includegraphics[width=12cm]{\VAR{ basedir }/resources/heia.eps}
 \vspace*{4cm}
@@ -112,7 +115,13 @@ pdfcreator={LaTeX via pandoc}}
 
 \BLOCK{ for p in projects }
 \newpage
+\BLOCK{ for k in p.keywords }
+\index{\VAR{ k }}
+\BLOCK{ endfor }
 \import{\VAR{ p.path }/}{\VAR{ p.name }} % \VAR{ p.title }
 \BLOCK{ endfor }
+
+\newpage
+\printindex
 
 \end{document}

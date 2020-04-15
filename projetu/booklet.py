@@ -14,13 +14,14 @@ CONTEXT_SETTINGS = dict(
 )
 
 @click.command(context_settings=CONTEXT_SETTINGS)
-@click.option('--template', 'template_file', type=click.Path(), default="project.md", help='Template')
+@click.option('--page-template', 'page_template_file', type=click.Path(), default="tb-page.md", help='Page Template')
+@click.option('--template', 'template_file', type=click.Path(), default="booklet.md", help='Template')
 @click.option('--config', type=click.File('r'), default=None)
 @click.option('--gitlab', 'gitlab_host', type=str, default="https://gitlab.forge.hefr.ch/")
 @click.option('--token', type=str, required=True)
 @click.option('--project-path', type=str, required=True)
 @click.option('--debug/--no-debug')
-def cli(template_file, config, gitlab_host, token, project_path, debug):
+def cli(page_template_file, template_file, config, gitlab_host, token, project_path, debug):
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -45,7 +46,7 @@ def cli(template_file, config, gitlab_host, token, project_path, debug):
         commit_id = master.commit['id']
 
         config.seek(0)
-        projetu = Projetu(template_file, project.namespace['name'], config)
+        projetu = Projetu(page_template_file, project.namespace['name'], config)
 
         tar = io.BytesIO(project.repository_archive())
         tar_base = f"{project.path}-master-{commit_id}"
@@ -70,6 +71,7 @@ def cli(template_file, config, gitlab_host, token, project_path, debug):
                         'title': projetu.meta['titre'],
                         'path': path.parent,
                         'name': path.stem,
+                        'keywords': projetu.meta['mots-clé'],
                     })
 
     project_list.sort(key=lambda x: x.get('title'))
@@ -78,7 +80,7 @@ def cli(template_file, config, gitlab_host, token, project_path, debug):
         'projects': project_list,
     }
 
-    template = Projetu.jinja_env.get_template("booklet.tex")
+    template = Projetu.jinja_env.get_template(template_file)
     rendered_data = template.render(data)
     with open("booklet_2020.tex", "wt") as f:
         f.write(rendered_data)

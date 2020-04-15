@@ -79,7 +79,7 @@ class Projetu:
         self.meta = meta_map
         logger.debug(meta)
         Core(source_data=meta_map, schema_files=[
-            str(self.base_dir/"schemas/meta.yml")]).validate()
+            str(self.base_dir/"schemas/meta_v1.yml")]).validate()
 
         data['meta'] = meta_map
         data['config'] = self.config_map

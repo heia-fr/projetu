@@ -1,7 +1,5 @@
-# \VAR{ meta.titre }
-
-\VAR{body}
-
+\BLOCK{ extends "base.md" }
+\BLOCK{ block meta }
 ## Méta-données
 
 \BLOCK{ if meta.mandants }
@@ -28,8 +26,8 @@
 \BLOCK{ if meta["nombre d'étudiants"] }
 - Nombre maximum d'étudiant(s) : \VAR{ meta["nombre d'étudiants"] }
 \BLOCK{ endif }
-\BLOCK{ if meta.students }
-- Etudiant(s) inscrit(s) : \VAR{ meta.students | join(", ") }
+\BLOCK{ if meta["attribué à"] }
+- Attribué à : \VAR{ meta["attribué à"] | join(", ") }
 \BLOCK{ endif }
 - Professeur : \VAR{ author }
 \BLOCK{ if meta["professeurs co-superviseurs"] }
@@ -45,3 +43,4 @@
 \BLOCK{ if meta["mots-clé"] }
 Mots clés: \VAR{ meta["mots-clé"] | join(", ") }
 \BLOCK{ endif }
+\BLOCK{ endblock }
