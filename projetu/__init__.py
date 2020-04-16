@@ -76,6 +76,15 @@ class Projetu:
 
         data = dict()
         meta_map = yaml.load(meta, Loader=yaml.FullLoader)
+
+        # Compatibility
+        keywords = list()
+        for k in ["mots-clés", "mots-clé"]:
+            if k in meta_map:
+                keywords += meta_map[k]
+        meta_map["mots-clés"] = keywords
+        meta_map["mots-clé"] = keywords
+
         self.meta = meta_map
         logger.debug(meta)
         Core(source_data=meta_map, schema_files=[
