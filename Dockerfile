@@ -8,7 +8,10 @@ ENV LANG=C.UTF-8
 # Install required software
 RUN apt-get update && apt-get install -y \
   context \
+  exiftran \
+  exiv2 \
   git \
+  libimage-exiftool-perl \
   texlive-latex-extra \
   texlive-latex-recommended \
   texlive-xetex \
