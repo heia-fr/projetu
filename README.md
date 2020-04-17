@@ -3,7 +3,7 @@
 Système de publication des projets d'étudiants (projets de semestre et travaux de diplômes)
 à la Haute école d'ingénierie et d'architecture de Fribourg.
 
-# Marche à suivre
+## Marche à suivre
 
 Voici la marche à suivre pour proposer des projets:
 
@@ -72,7 +72,7 @@ build:
 ```
   - A chaque fois que vous ferez un `git commit` et que vous enverrez les changements sur gitlab (avec un `git push`), le CI/CD de gitlab produira les PDFs correspondants à vous fichiers. Assurez-vous que la compilation ne produise pas d'erreur.
   
-# Exemple
+## Exemple
 
 le projet https://gitlab.forge.hefr.ch/jacques.supcik/ps6-2019-2020 montre
 comment le système fonctionne.
@@ -90,3 +90,72 @@ Ensuite cliquez sur "browse":
 Et vous verrez le résultat (pdf) de vos fichiers:
 
 ![](doc/readme3.png)
+
+## Compilation sur votre machine
+
+Si vous souhaitez obtenir le PDF sans passer par le CI/CD de
+gitlab, vous pouvez utiliser l'image Docker de la manière suivante:
+
+1.  Installer Docker si vous ne l'avez pas encore
+2.  Télécharger l'image Docker pour _projetu_
+    ```
+    docker login registry.forge.hefr.ch
+    docker pull registry.forge.hefr.ch/jacques.supcik/projetu
+    ```
+3.  Compiler vos fichiers
+    ```
+    docker run --rm -ti -v $(pwd):/src -w "/src" \
+      registry.forge.hefr.ch/jacques.supcik/projetu \
+      bash -c "ls *.md | grep -v README | xargs \
+        projetu --author=\"$(whoami)\" \
+          --template=tb.md \
+          --config /app/tb-2019-2020.yml"
+    ```
+    ou alors, pour un seul fichier à la fois:
+    ```
+    docker run --rm -ti -v $(pwd):/src -w "/src" \
+      registry.forge.hefr.ch/jacques.supcik/projetu \
+      projetu --author="MY NAME" \
+        --template=tb.md --config /app/tb-2019-2020.yml \
+        MY_PROJECT_FILE.md
+    ```
+
+Vous pouvez aussi faire sans Docker, mais il vous faudra installer tous les logiciels
+sur votre machine : LaTeX, Pandoc, Python 3, ainsi que le code pour _projetu_.
+
+## Note
+
+Depuis la version 11.9.4 de gitlab, le téléversement d'image au travers de l'interface
+web (et également avec le WebIDE) modifie les métadonnées des images:
+
+https://about.gitlab.com/releases/2019/04/01/security-release-gitlab-11-dot-9-dot-4-released/#exif-geolocation-data-not-stripped-from-uploaded-images
+
+Ceci à pour conséquence de "casser" LaTeX lorsque ces images sont utilisées. Ca se
+traduit souvent par une erreur du genre :
+
+```
+ ! Package graphics Error: Division by 0.
+ 
+ See the graphics package documentation for explanation.
+ Type  H <return>  for immediate help.
+ ...
+ 
+ l.xxx ...{img/figure.jpg}
+```
+
+Si vous utilisez le WebIDE de gitlab et si vous avez ce genre d'erreur, vous
+pouvez y remédier en corrigeant les images dans le pipeline du CI/CD à l'aide du programme `exiftool` (inclu dans l'image Docker à partir de la version 0.1.2)
+
+votre `.gitlab-ci.yml` pourrait alors ressembler à ça:
+
+```
+image: "registry.forge.hefr.ch/jacques.supcik/projetu:latest"
+
+build:
+  script:
+    ls img/* | xargs exiftool -jfif:Xresolution=300 -jfif:Yresolution=300 -jfif:ResolutionUnit=inches
+    ls *.md | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb.md --config /app/tb-2019-2020.yml
+  artifacts:
+    paths:
+      - ./*.pdf
+```
