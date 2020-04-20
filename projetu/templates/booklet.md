@@ -115,10 +115,10 @@ pdfcreator={LaTeX via pandoc}}
 
 \BLOCK{ for p in projects }
 \newpage
-\BLOCK{ for k in p.keywords }
+\BLOCK{ for k in p.meta["mots-clés"] }
 \index{\VAR{ k }}
 \BLOCK{ endfor }
-\import{\VAR{ p.path }/}{\VAR{ p.name }} % \VAR{ p.title }
+\import{\VAR{ p.path }/}{\VAR{ p.name }} % \VAR{ p.meta.titre }
 \BLOCK{ endfor }
 
 \newpage
