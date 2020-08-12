@@ -1,6 +1,6 @@
 # Projetu
 
-Système de publication des projets d'étudiants (projets de semestre et travaux de diplômes)
+Système de publication des projets d'étudiants (projets de semestre, travaux de diplômes et projets de master)
 à la Haute école d'ingénierie et d'architecture de Fribourg.
 
 ## Marche à suivre
@@ -9,15 +9,17 @@ Voici la marche à suivre pour proposer des projets:
 
 - Créer un projet sur https://gitlab.forge.hefr.ch/, dans votre "namespace" (prénom.nom), avec le nom communiqué par le responsable de filière (par exemple `ps6-2019-2020`). Le projet peut être _public_, _internal_, ou alors _private_, mais dans ce dernier cas, le responsable de filière doit être ajouté aux membres du projet avec le rôle de _reporter_ (ou plus).
 - Pour chaque projet, rédiger un fichier **avec l'extension `.md`**. Ce fichier se compose de deux parties:
-  - Un "front matter" en _YAML_ avec les méta données du projet. Cette partie doit respecter le schéma [Kwalify](http://www.kuwata-lab.com/kwalify/) suivant : https://gitlab.forge.hefr.ch/jacques.supcik/projetu/-/blob/master/projetu/schemas/meta_v1.yml
+  - Un "front matter" en _YAML_ avec les méta données du projet. Cette partie doit respecter le schéma [Kwalify](http://www.kuwata-lab.com/kwalify/) suivant : https://gitlab.forge.hefr.ch/jacques.supcik/projetu/-/blob/master/projetu/schemas/meta_v2.yml
   - La donnée du projet en markdown avec des sections telles que "Contexte", "Objectifs", "Contraintes".
   
   Voici un exemple pour un tel fichier
 
   ```
   ---
-  version: 1
+  version: 2
   titre: Mon super projet
+  type de projet: Projet de bachelor
+  année scolaire: 2019/2020
   filières:
     - Informatique
     - Télécommunications
@@ -54,7 +56,7 @@ Voici la marche à suivre pour proposer des projets:
 
       ```{=tex}
       \begin{center}
-      \includegraphics[width=0.7\textwidth,height=\textheight]{img/pro.jpg}
+      \includegraphics[width=0.7\textwidth]{img/pro.jpg}
       \end{center}
       ```
 
@@ -65,7 +67,7 @@ image: "registry.forge.hefr.ch/jacques.supcik/projetu:latest"
 
 build:
   script:
-    ls *.md | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb.md --config /app/tb-2019-2020.yml
+    ls *.md | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb_v2.md
   artifacts:
     paths:
       - ./*.pdf
