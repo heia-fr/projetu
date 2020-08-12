@@ -27,8 +27,16 @@ def cli(template_file, author, config, debug, input_files):
         tex_file = p.run_pandoc(rendered_data)
         pdf_file = p.run_latex(tex_file, stem)
         logging.debug("Saving PDF")
+
+        tex_file.seek(0)
+        with open(f"{stem}.tex", "wt") as f:
+            f.write(tex_file.read())
+
+
         with open(f"{stem}.pdf", "wb") as f:
             f.write(pdf_file.read())
+
+        
 
 
 if __name__ == "__main__":

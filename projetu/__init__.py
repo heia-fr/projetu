@@ -53,7 +53,7 @@ class Projetu:
             Core(source_data=self.config_map, schema_files=[
                 str(self.base_dir/"schemas/config.yml")]).validate()
 
-    def mark_down(self, input_file):
+    def mark_down(self, input_file, meta_map = None):
         meta = ""
         body = ""
 
@@ -74,22 +74,26 @@ class Projetu:
             body += l
             l = input_file.readline()
 
-        data = dict()
-        meta_map = yaml.load(meta, Loader=yaml.FullLoader)
+        if meta_map is None:
+            meta_map = yaml.load(meta, Loader=yaml.FullLoader)
 
-        # Compatibility
-        keywords = list()
-        for k in ["mots-clés", "mots-clé"]:
-            if k in meta_map:
-                keywords += meta_map[k]
-        meta_map["mots-clés"] = keywords
-        meta_map["mots-clé"] = keywords
+            # Compatibility
+            keywords = list()
+            for k in ["mots-clés", "mots-clé"]:
+                if k in meta_map:
+                    keywords += meta_map[k]
+            meta_map["mots-clés"] = keywords
+            meta_map["mots-clé"] = keywords
 
         self.meta = meta_map
         logger.debug(meta)
-        Core(source_data=meta_map, schema_files=[
-            str(self.base_dir/"schemas/meta_v1.yml")]).validate()
 
+        schema_file = self.base_dir/f"schemas/meta_v{meta_map['version']}.yml"
+        if not Path.exists(schema_file):
+            raise Exception (f"Version {meta_map['version']} does not exist.")
+        Core(source_data=meta_map, schema_files=[str(schema_file)]).validate()
+
+        data = dict()
         data['meta'] = meta_map
         data['config'] = self.config_map
         data['author'] = self.author

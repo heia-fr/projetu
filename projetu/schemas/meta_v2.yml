@@ -1,0 +1,122 @@
+type: map
+mapping:
+  version:
+    type: int
+    required: yes
+  type de projet:
+    type: str
+    required: yes
+  année scolaire:
+    type: str
+    required: yes
+  titre:
+    type: str
+    required: yes
+  abréviation:
+    type: str
+    required: no
+  filières:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - Informatique
+          - Télécommunications
+          - ISC
+          - Informatique et Systèmes de Communication
+    required: yes
+  orientations:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - Internet et communication
+          - Réseaux et sécurité
+          - Informatique logicielle
+          - Réseaux et Systèmes
+          - Ingénierie des données
+    required: no
+  langue:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - D
+          - F
+          - E
+    required: yes
+  professeurs co-superviseurs:
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  assistants:
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  proposé par étudiant:
+    type: str
+    required: no
+  mandants:
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  instituts:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - HumanTech
+          - iCoSys
+          - iSIS
+          - ENERGY
+          - ChemTech
+          - iPrint
+          - iRAP
+          - iTEC
+          - SeSi
+          - TRANSFORM
+    required: no
+  confidentialité:
+    type: str
+    enum:
+      - oui
+      - non
+    required: yes
+  réalisation:
+    type: str
+    enum:
+      - labo
+      - entreprise
+      - étranger
+      - instituts externe
+    required: no
+  mots-clés: # new in v0.0.8
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  mots-clé: # deprecated
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  attribué à:
+    type: seq
+    sequence:
+      - type: str
+    required: no
+  nombre d'étudiants:
+    type: int
+    range:
+      min: 1
+      max: 2
+    required: yes
+  suite:
+    type: str
+    enum:
+      - oui
+      - non
+    required: yes

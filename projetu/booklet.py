@@ -16,6 +16,8 @@ CONTEXT_SETTINGS = dict(
     auto_envvar_prefix='PROJETU'
 )
 
+PROFESSEUR = 'professeur'
+ATTRIBUE_A = 'attribué à'
 
 def build_from_git(gitlab_host, token, project_path, page_template_file, config):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
@@ -76,10 +78,11 @@ def build_from_cache(project_list, page_template_file, config):
         config.seek(0)
         projetu = Projetu(page_template_file, author, config)
         for p in project_list:
-            path = Path(p['full_path'].name)
+            path = Path(p['full_path'])
             with open(path) as f:
                 try:
-                    rendered_data = projetu.mark_down(f)
+                    print(p['meta'])
+                    rendered_data = projetu.mark_down(f, meta_map=p['meta'])
                     tex_file = projetu.run_pandoc(
                         rendered_data, standalone=False)
                 except Exception as e:
@@ -97,7 +100,7 @@ def build_from_cache(project_list, page_template_file, config):
 @click.option('--gitlab', 'gitlab_host', type=str, default="https://gitlab.forge.hefr.ch/")
 @click.option('--token', type=str, required=True)
 @click.option('--project-path', type=str, required=True)
-@click.option('--output', type=str, default="booklet-2020")
+@click.option('--output', type=str, default="booklet_2020")
 @click.option('--filter', 'project_filter', type=click.File(), default=None)
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
@@ -109,31 +112,50 @@ def cli(page_template_file, template_file, config, gitlab_host, token, project_p
         logging.basicConfig(level=logging.INFO)
 
     if from_cache:
+        with open(Path(output).with_suffix(".pickle"), "rb") as f:
+            project_list = pickle.load(f)
+        build_from_cache(project_list, page_template_file, config)
+    else:
         project_list = build_from_git(
             gitlab_host, token, project_path, page_template_file, config)
         with open(Path(output).with_suffix(".pickle"), "wb") as f:
             pickle.dump(project_list, f)
-    else:
-        with open(Path(output).with_suffix(".pickle"), "rb") as f:
-            project_list = pickle.load(f)
-        build_from_cache(project_list, page_template_file, config)
 
     def clean_list(l):
         if l is None:
             return []
         return [i for i in l if i is not None]
 
-    project_list.sort(key=lambda x: x['meta']['titre'])
+    project_list.sort(key=lambda x: x['meta']['titre'].upper())
 
     if project_filter is not None:
         filter_map = dict()
-        projects_reader = csv.reader(project_filter)
-        projects_reader.__next__()  # skip header
+        projects_reader = csv.DictReader(project_filter)
         for row in projects_reader:
-            filter_map[(row[1], row[2])] = True
-        print(filter_map)
-        project_list = [i for i in project_list if (
-            i['name'], i['author']) in filter_map]
+            filter_map[(row['name'], row[PROFESSEUR])] = row
+        logging.debug(filter_map)
+        filtered_list = list()
+        done_keys = set()
+        for p in project_list:
+            key = (p['name'], p['author'])
+            if key in filter_map:
+                done_keys.add(key)
+                item = filter_map[key]
+                logging.info("Adding project : %s (%s)", key[0], key[1])
+                students = [x.strip() for x in item[ATTRIBUE_A].split(",")]
+                if not ATTRIBUE_A in p['meta']:
+                    p['meta'][ATTRIBUE_A] = list()
+                if p['meta'][ATTRIBUE_A] != students:
+                    logging.info("Fixing attribution : %s -> %s", p['meta'][ATTRIBUE_A], students)
+                    p['meta'][ATTRIBUE_A] = students
+                filtered_list.append(p)
+
+        for key in filter_map.keys():
+            if not key in done_keys:
+                logging.error("KEY %s not found in project list", key)
+
+        project_list = filtered_list
+        build_from_cache(project_list, page_template_file, config)
 
     data = {
         'basedir': Path(__file__).parent,
@@ -145,14 +167,14 @@ def cli(page_template_file, template_file, config, gitlab_host, token, project_p
         projects_writer.writerow([
             'path',
             'name',
-            'professeur',
+            PROFESSEUR,
             'titre',
             'filières',
             'orientations',
             'langue',
             'professeurs co-superviseurs',
             'assistants',
-            'attribué à',
+            ATTRIBUE_A,
         ])
 
         for p in project_list:
@@ -167,7 +189,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, project_p
                 ", ".join(clean_list(p['meta'].get(
                     'professeurs co-superviseurs', []))),
                 ", ".join(clean_list(p['meta'].get('assistants', []))),
-                ", ".join(clean_list(p['meta'].get('attribué à', []))),
+                ", ".join(clean_list(p['meta'].get(ATTRIBUE_A, []))),
             ])
 
     template = Projetu.jinja_env.get_template(template_file)
