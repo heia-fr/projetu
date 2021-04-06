@@ -6,6 +6,7 @@ import os
 import pickle
 import tarfile
 from pathlib import Path
+import yaml
 
 import click
 import gitlab
@@ -19,19 +20,28 @@ CONTEXT_SETTINGS = dict(
 PROFESSEUR = 'professeur'
 ATTRIBUE_A = 'attribué à'
 
-def build_from_git(gitlab_host, token, project_path, page_template_file, config):
+def build_from_git(gitlab_host, token, project_path, profs_list, page_template_file, config):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
     projects = gl.projects.list(search=project_path, all=True)
     project: gitlab.base.RESTObject
     project_list = list()
     for project in projects:
-        logging.debug("Project path : %s", project.path)
+        logging.info("Project path : %s", project.path)
         if project.path != project_path:
             logging.warn("Bad project name : %s", project.path_with_namespace)
             continue
+        if profs_list is not None and project.owner['username'] not in profs_list:
+            logging.warn("Not prof : %s", project.owner['username'])
+            continue
 
         logging.debug("Author : %s", project.namespace['name'])
-        master = project.branches.get("master")
+
+        try:
+            master = project.branches.get("master")
+        except Exception as e:
+            logging.error(e)
+            continue
+
         commit_id = master.commit['id']
 
         config.seek(0)
@@ -100,16 +110,21 @@ def build_from_cache(project_list, page_template_file, config):
 @click.option('--gitlab', 'gitlab_host', type=str, default="https://gitlab.forge.hefr.ch/")
 @click.option('--token', type=str, required=True)
 @click.option('--project-path', type=str, required=True)
+@click.option('--profs', type=click.File('r'), default=None)
 @click.option('--output', type=str, default="booklet_2020")
 @click.option('--filter', 'project_filter', type=click.File(), default=None)
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
-def cli(page_template_file, template_file, config, gitlab_host, token, project_path, output, project_filter, debug, from_cache):
+def cli(page_template_file, template_file, config, gitlab_host, token, project_path, profs, output, project_filter, debug, from_cache):
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
+
+    profs_list = None
+    if profs is not None:
+        profs_list = yaml.load(profs, Loader=yaml.FullLoader)
 
     if from_cache:
         with open(Path(output).with_suffix(".pickle"), "rb") as f:
@@ -117,7 +132,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, project_p
         build_from_cache(project_list, page_template_file, config)
     else:
         project_list = build_from_git(
-            gitlab_host, token, project_path, page_template_file, config)
+            gitlab_host, token, project_path, profs_list, page_template_file, config)
         with open(Path(output).with_suffix(".pickle"), "wb") as f:
             pickle.dump(project_list, f)
 
@@ -172,12 +187,15 @@ def cli(page_template_file, template_file, config, gitlab_host, token, project_p
             'filières',
             'orientations',
             'langue',
+            'max students',
             'professeurs co-superviseurs',
             'assistants',
             ATTRIBUE_A,
         ])
 
+        
         for p in project_list:
+            # print(p)
             projects_writer.writerow([
                 p['path'],
                 p['name'],
@@ -186,6 +204,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, project_p
                 ", ".join(clean_list(p['meta'].get('filières', []))),
                 ", ".join(clean_list(p['meta'].get('orientations', []))),
                 ", ".join(clean_list(p['meta'].get('langue', []))),
+                p['meta']['nombre d\'étudiants'],
                 ", ".join(clean_list(p['meta'].get(
                     'professeurs co-superviseurs', []))),
                 ", ".join(clean_list(p['meta'].get('assistants', []))),

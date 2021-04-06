@@ -2,19 +2,19 @@ type: map
 mapping:
   version:
     type: int
-    required: yes
+    required: True
   type de projet:
     type: str
-    required: yes
+    required: True
   année scolaire:
     type: str
-    required: yes
+    required: True
   titre:
     type: str
-    required: yes
+    required: True
   abréviation:
     type: str
-    required: no
+    required: False
   filières:
     type: seq
     sequence:
@@ -24,7 +24,7 @@ mapping:
           - Télécommunications
           - ISC
           - Informatique et Systèmes de Communication
-    required: yes
+    required: True
   orientations:
     type: seq
     sequence:
@@ -35,7 +35,7 @@ mapping:
           - Informatique logicielle
           - Réseaux et Systèmes
           - Ingénierie des données
-    required: no
+    required: False
   langue:
     type: seq
     sequence:
@@ -44,25 +44,25 @@ mapping:
           - D
           - F
           - E
-    required: yes
+    required: True
   professeurs co-superviseurs:
     type: seq
     sequence:
       - type: str
-    required: no
+    required: False
   assistants:
     type: seq
     sequence:
       - type: str
-    required: no
+    required: False
   proposé par étudiant:
     type: str
-    required: no
+    required: False
   mandants:
     type: seq
     sequence:
       - type: str
-    required: no
+    required: False
   instituts:
     type: seq
     sequence:
@@ -78,13 +78,13 @@ mapping:
           - iTEC
           - SeSi
           - TRANSFORM
-    required: no
+    required: False
   confidentialité:
     type: str
     enum:
       - oui
       - non
-    required: yes
+    required: True
   réalisation:
     type: str
     enum:
@@ -92,31 +92,31 @@ mapping:
       - entreprise
       - étranger
       - instituts externe
-    required: no
+    required: False
   mots-clés: # new in v0.0.8
     type: seq
     sequence:
       - type: str
-    required: no
+    required: False
   mots-clé: # deprecated
     type: seq
     sequence:
       - type: str
-    required: no
+    required: False
   attribué à:
     type: seq
     sequence:
       - type: str
-    required: no
+    required: False
   nombre d'étudiants:
     type: int
     range:
       min: 1
       max: 2
-    required: yes
+    required: True
   suite:
     type: str
     enum:
       - oui
       - non
-    required: yes
+    required: True
