@@ -7,7 +7,7 @@
 
 ```
 
-# \VAR{ meta.titre }
+# \VAR{ meta.title }
 
 ```{=latex}
 \begin{center}

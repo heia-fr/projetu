@@ -5,14 +5,11 @@
 \BLOCK{ if meta.mandants }
 - Mandant(s) : \VAR{ meta.mandants | join(", ") }
 \BLOCK{ endif }
-\BLOCK{ if meta["confidentialité"] == "oui" }
+\BLOCK{ if meta["confidentiality"] == "oui" }
 - **Projet confidentiel**
 \BLOCK{ endif }
-\BLOCK{ if meta["proposé par étudiant"] }
-- Proposé par : \VAR{ meta["proposé par étudiant"] }
-\BLOCK{ endif }
-\BLOCK{ if meta.filières }
-- Filière(s) : \VAR{ meta.filières | join(", ") }
+\BLOCK{ if meta.departments }
+- Filière(s) : \VAR{ meta.departments | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ if meta.orientations }
 - Orientation(s) : \VAR{ meta.orientations | join(", ") }
@@ -20,27 +17,27 @@
 \BLOCK{ if meta.instituts }
 - Instituts(s) : \VAR{ meta.instituts | join(", ") }
 \BLOCK{ endif }
-\BLOCK{ if meta.langue }
-- Langue : \VAR{ meta.langue | join(", ") }
+\BLOCK{ if meta.language }
+- Langue : \VAR{ meta.language | join(", ") }
 \BLOCK{ endif }
-\BLOCK{ if meta["nombre d'étudiants"] }
-- Nombre maximum d'étudiant(s) : \VAR{ meta["nombre d'étudiants"] }
+\BLOCK{ if meta["number of students"] }
+- Nombre maximum d'étudiant(s) : \VAR{ meta["number of students"] }
 \BLOCK{ endif }
-\BLOCK{ if meta["attribué à"] }
-- Attribué à : \VAR{ meta["attribué à"] | join(", ") }
+\BLOCK{ if meta["assigned to"] }
+- Attribué à : \VAR{ meta["assigned to"] | join(", ") }
 \BLOCK{ endif }
 - Professeur : \VAR{ author }
-\BLOCK{ if meta["professeurs co-superviseurs"] }
-- Co-superviseur(s): \VAR{ meta["professeurs co-superviseurs"] | join(", ") }
+\BLOCK{ if meta["co-supervising professors"] }
+- Co-superviseur(s): \VAR{ meta["co-supervising professors"] | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ if meta.assistants }
 - Assistants: \VAR{ meta.assistants | join(", ") }
 \BLOCK{ endif }
-\BLOCK{ if meta.suite == "oui" }
+\BLOCK{ if meta.continuation == "oui" }
 - Ce projet de bachelor est la suite d'un travail de semestre réalisée par le même étudiant
 \BLOCK{ endif }
 
-\BLOCK{ if meta["mots-clé"] }
-Mots clés: \VAR{ meta["mots-clé"] | join(", ") }
+\BLOCK{ if meta["keywords"] }
+Mots clés: \VAR{ meta["keywords"] | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ endblock }

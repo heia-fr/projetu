@@ -1,0 +1,119 @@
+type: map
+mapping:
+  version:
+    type: int
+    required: True
+  type:
+    type: str
+    enum:
+    - Projet de semestre 5
+    - Projet de semestre 6
+    - Projet de bachelor
+    required: True
+  schoolyear:
+    type: str
+    required: True
+    pattern: \d{4}/\d{4}
+  title:
+    type: str
+    required: True
+  abbreviation:
+    type: str
+    required: False
+  departments:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - Informatique
+          - Télécommunications
+          - ISC
+          - Informatique et Systèmes de Communication
+    required: True
+  orientations:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - Internet et communication
+          - Réseaux et sécurité
+          - Informatique logicielle
+          - Réseaux et Systèmes
+          - Ingénierie des données
+    required: False
+  languages:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - D
+          - F
+          - E
+    required: True
+  co-supervising professors:
+    type: seq
+    sequence:
+      - type: str
+    required: False
+  assistants:
+    type: seq
+    sequence:
+      - type: str
+    required: False
+  mandants:
+    type: seq
+    sequence:
+      - type: str
+    required: False
+  instituts:
+    type: seq
+    sequence:
+      - type: str
+        enum:
+          - HumanTech
+          - iCoSys
+          - iSIS
+          - ENERGY
+          - ChemTech
+          - iPrint
+          - iRAP
+          - iTEC
+          - SeSi
+          - TRANSFORM
+    required: False
+  confidentiality:
+    type: str
+    enum:
+      - oui
+      - non
+    required: True
+  réalisation:
+    type: str
+    enum:
+      - labo
+      - entreprise
+      - étranger
+      - instituts externe
+    required: False
+  keywords:
+    type: seq
+    sequence:
+      - type: str
+    required: False
+  assigned to:
+    type: seq
+    sequence:
+      - type: str
+    required: False
+  number of students:
+    type: int
+    range:
+      min: 1
+      max: 2
+    required: True
+  continuation:
+    type: str
+    enum:
+      - oui
+      - non
+    required: True

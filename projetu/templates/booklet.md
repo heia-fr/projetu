@@ -96,7 +96,7 @@ pdfcreator={LaTeX via pandoc}}
 \includegraphics[width=12cm]{\VAR{ basedir }/resources/heia.eps}
 \vspace*{4cm}
 \begin{center}
-\Huge{\textbf{Projets de bachelor 2019/2020}}
+\Huge{\textbf{\VAR{ project_type } \VAR{ schoolyear }}}
 \vspace*{1cm}
 
 \LARGE{Filières informatique et télécommunications}
@@ -115,10 +115,10 @@ pdfcreator={LaTeX via pandoc}}
 
 \BLOCK{ for p in projects }
 \newpage
-\BLOCK{ for k in p.meta["mots-clés"] }
+\BLOCK{ for k in p.meta.keywords }
 \index{\VAR{ k }}
 \BLOCK{ endfor }
-\import{\VAR{ p.path }/}{"\VAR{ p.name }"} % \VAR{ p.meta.titre }
+\import{\VAR{ p.path }/}{"\VAR{ p.name }"} % \VAR{ p.meta.title }
 \BLOCK{ endfor }
 
 \newpage

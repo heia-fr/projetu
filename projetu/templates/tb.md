@@ -2,7 +2,7 @@
 \BLOCK{ block title }
 ![](\VAR{ basedir }/resources/heia.eps){ width=10cm }
 
-# \VAR{ meta.titre }
+# \VAR{ meta.title }
 
 ```{=latex}
 \begin{center}
