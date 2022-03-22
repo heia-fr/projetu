@@ -63,11 +63,11 @@ Voici la marche à suivre pour proposer des projets:
 - Définissez un fichier `.gitlab-ci.yml` avec le contenu suivant:
 
 ```yaml
-image: "registry.forge.hefr.ch/jacques.supcik/projetu:latest"
+image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
 
 build:
   script:
-    ls *.md | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb_v2.md
+    find . -type f | grep \.md$ | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb_v2.md
   artifacts:
     paths:
       - ./*.pdf

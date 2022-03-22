@@ -51,8 +51,8 @@ def build_from_git(gitlab_host, token, project_type, schoolyear, profs_list, pag
                 continue
 
             commit_id = branch.commit['id']
-
-            config.seek(0)
+            if config!=None:
+                config.seek(0)
             projetu = Projetu(page_template_file,
                             project.namespace['name'], config)
 
@@ -115,7 +115,7 @@ def build_from_cache(project_list, page_template_file, config):
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--page-template', 'page_template_file', type=click.Path(), default="tb-page.md", help='Page Template')
 @click.option('--template', 'template_file', type=click.Path(), default="booklet.md", help='Template')
-@click.option('--config', type=click.File('r'), required=True)
+@click.option('--config', type=click.File('r'))
 @click.option('--gitlab', 'gitlab_host', type=str, default="https://gitlab.forge.hefr.ch/")
 @click.option('--token', type=str, required=True)
 @click.option('--profs', type=click.File('r'), default=None)
@@ -185,7 +185,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
     data = {
         'basedir': Path(__file__).parent,
         'projects': project_list,
-        'project_type': project_type,
+        'project_type': ProjectType[project_type].value,
         'schoolyear': schoolyear
     }
 
