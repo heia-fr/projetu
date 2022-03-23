@@ -10,7 +10,7 @@ mapping:
     - Projet de semestre 6
     - Projet de bachelor
     required: True
-  schoolyear:
+  school_year:
     type: str
     required: True
     pattern: \d{4}/\d{4}
@@ -50,7 +50,7 @@ mapping:
           - F
           - E
     required: True
-  co-supervising professors:
+  professors:
     type: seq
     sequence:
       - type: str
@@ -60,7 +60,7 @@ mapping:
     sequence:
       - type: str
     required: False
-  mandants:
+  mandantors:
     type: seq
     sequence:
       - type: str
@@ -81,39 +81,25 @@ mapping:
           - SeSi
           - TRANSFORM
     required: False
-  confidentiality:
-    type: str
-    enum:
-      - oui
-      - non
+  confidential:
+    type: bool
     required: True
-  réalisation:
-    type: str
-    enum:
-      - labo
-      - entreprise
-      - étranger
-      - instituts externe
-    required: False
   keywords:
     type: seq
     sequence:
       - type: str
     required: False
-  assigned to:
+  assigned_to:
     type: seq
     sequence:
       - type: str
     required: False
-  number of students:
+  max_students:
     type: int
     range:
       min: 1
       max: 2
     required: True
   continuation:
-    type: str
-    enum:
-      - oui
-      - non
+    type: bool
     required: True

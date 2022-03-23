@@ -2,10 +2,10 @@
 \BLOCK{ block meta }
 ## Méta-données
 
-\BLOCK{ if meta.mandants }
-- Mandant(s) : \VAR{ meta.mandants | join(", ") }
+\BLOCK{ if meta.mandantors }
+- Mandant(s) : \VAR{ meta.mandantors | join(", ") }
 \BLOCK{ endif }
-\BLOCK{ if meta["confidentiality"] == "oui" }
+\BLOCK{ if meta.confidential }
 - **Projet confidentiel**
 \BLOCK{ endif }
 \BLOCK{ if meta.departments }
@@ -20,24 +20,24 @@
 \BLOCK{ if meta.language }
 - Langue : \VAR{ meta.language | join(", ") }
 \BLOCK{ endif }
-\BLOCK{ if meta["number of students"] }
-- Nombre maximum d'étudiant(s) : \VAR{ meta["number of students"] }
+\BLOCK{ if meta.max_students }
+- Nombre maximum d'étudiant(s) : \VAR{ meta.max_students }
 \BLOCK{ endif }
-\BLOCK{ if meta["assigned to"] }
-- Attribué à : \VAR{ meta["assigned to"] | join(", ") }
+\BLOCK{ if meta.assigned_to }
+- Attribué à : \VAR{ meta.assigned_to | join(", ") }
 \BLOCK{ endif }
 - Professeur : \VAR{ author }
-\BLOCK{ if meta["co-supervising professors"] }
-- Co-superviseur(s): \VAR{ meta["co-supervising professors"] | join(", ") }
+\BLOCK{ if meta.professors }
+- Co-superviseur(s): \VAR{ meta.professors | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ if meta.assistants }
 - Assistants: \VAR{ meta.assistants | join(", ") }
 \BLOCK{ endif }
-\BLOCK{ if meta.continuation == "oui" }
+\BLOCK{ if meta.continuation }
 - Ce projet de bachelor est la suite d'un travail de semestre réalisée par le même étudiant
 \BLOCK{ endif }
 
-\BLOCK{ if meta["keywords"] }
-Mots clés: \VAR{ meta["keywords"] | join(", ") }
+\BLOCK{ if meta.keywords }
+Mots clés: \VAR{ meta.keywords | join(", ") }
 \BLOCK{ endif }
 \BLOCK{ endblock }

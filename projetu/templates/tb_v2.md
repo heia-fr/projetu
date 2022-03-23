@@ -6,7 +6,7 @@
 
 ```{=latex}
 \begin{center}
-{\Large\textbf{\VAR{meta.type} - \VAR{meta.schoolyear}}} 
+{\Large\textbf{\VAR{meta.type} - \VAR{meta.school_year}}} 
 \end{center}
 \medskip
 

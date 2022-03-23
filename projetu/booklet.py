@@ -24,7 +24,7 @@ class ProjectType(Enum):
     ps6 = "Projet de semestre 6"
     tb = "Projet de bachelor"
 
-def build_from_git(gitlab_host, token, project_type, schoolyear, profs_list, page_template_file, config):
+def build_from_git(gitlab_host, token, project_type, school_year, profs_list, page_template_file, config):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
     project_list = list()
     main_group = gl.groups.get(3063)
@@ -72,7 +72,7 @@ def build_from_git(gitlab_host, token, project_type, schoolyear, profs_list, pag
                             except Exception as e:
                                 logging.warn(e)
                                 continue
-                        if projetu.meta['type'] == ProjectType[project_type].value and projetu.meta['schoolyear'] == schoolyear:
+                        if projetu.meta['type'] == ProjectType[project_type].value and projetu.meta['school_year'] == school_year:
                             with open(path.with_suffix('.tex'), "wt") as f:
                                 f.write(tex_file.read())
 
@@ -84,7 +84,7 @@ def build_from_git(gitlab_host, token, project_type, schoolyear, profs_list, pag
                                 'meta': projetu.meta
                             })
                         else:
-                            logging.info(f"Project \"{projetu.meta['title']}\" not included. Type: {projetu.meta['type']} {projetu.meta['schoolyear']}")
+                            logging.info(f"Project \"{projetu.meta['title']}\" not included. Type: {projetu.meta['type']} - {projetu.meta['school_year']}")
     return project_list
 
 
@@ -120,12 +120,12 @@ def build_from_cache(project_list, page_template_file, config):
 @click.option('--token', type=str, required=True)
 @click.option('--profs', type=click.File('r'), default=None)
 @click.option('--type','project_type', type=click.Choice(list(map(lambda x: x.name, ProjectType))),default="tb")
-@click.option('--schoolyear', type=str, default="2021/2022")
+@click.option('--school-year', 'school_year', type=str, default="2021/2022")
 @click.option('--output', type=str, default="booklet_2020")
 @click.option('--filter', 'project_filter', type=click.File(), default=None)
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
-def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, schoolyear, output, project_filter, debug, from_cache):
+def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, school_year, output, project_filter, debug, from_cache):
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -142,7 +142,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         build_from_cache(project_list, page_template_file, config)
     else:
         project_list = build_from_git(
-            gitlab_host, token, project_type, schoolyear, profs_list, page_template_file, config)
+            gitlab_host, token, project_type, school_year, profs_list, page_template_file, config)
         with open(Path(output).with_suffix(".pickle"), "wb") as f:
             pickle.dump(project_list, f)
 
@@ -186,7 +186,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         'basedir': Path(__file__).parent,
         'projects': project_list,
         'project_type': ProjectType[project_type].value,
-        'schoolyear': schoolyear
+        'school_year': school_year
     }
 
     with open(Path(output).with_suffix(".csv"), 'w', newline='') as csvfile:
@@ -199,10 +199,10 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
             'departments',
             'orientations',
             'languages',
-            'number of students',
-            'co-supervising professors',
+            'max_students',
+            'professors',
             'assistants',
-            'assigned to',
+            'assigned_to',
         ])
 
         
@@ -216,11 +216,10 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
                 ", ".join(clean_list(p['meta'].get('departments', []))),
                 ", ".join(clean_list(p['meta'].get('orientations', []))),
                 ", ".join(clean_list(p['meta'].get('languages', []))),
-                p['meta']['number of students'],
-                ", ".join(clean_list(p['meta'].get(
-                    'co-supervising professors', []))),
+                p['meta']['max_students'],
+                ", ".join(clean_list(p['meta'].get('professors', []))),
                 ", ".join(clean_list(p['meta'].get('assistants', []))),
-                ", ".join(clean_list(p['meta'].get('assigned to', []))),
+                ", ".join(clean_list(p['meta'].get('assigned_to', []))),
             ])
 
     template = Projetu.jinja_env.get_template(template_file)
