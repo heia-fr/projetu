@@ -96,7 +96,7 @@ pdfcreator={LaTeX via pandoc}}
 \includegraphics[width=12cm]{\VAR{ basedir }/resources/heia.eps}
 \vspace*{4cm}
 \begin{center}
-\Huge{\textbf{\VAR{ project_type } - \VAR{ school_year }}}
+\Huge{\textbf{\VAR{ project_type } - \VAR{ academic_year }}}
 \vspace*{1cm}
 
 \LARGE{Filières informatique et télécommunications}

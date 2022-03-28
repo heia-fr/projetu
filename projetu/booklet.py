@@ -24,7 +24,7 @@ class ProjectType(Enum):
     ps6 = "Projet de semestre 6"
     tb = "Projet de bachelor"
 
-def build_from_git(gitlab_host, token, project_type, school_year, profs_list, page_template_file, config):
+def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, page_template_file, config):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
     project_list = list()
     main_group = gl.groups.get(3063)
@@ -34,7 +34,7 @@ def build_from_git(gitlab_host, token, project_type, school_year, profs_list, pa
         subgroup = gl.groups.get(sg.id)
         for m in subgroup.members.list():
             if m.access_level == gitlab.const.MAINTAINER_ACCESS:
-                prof = m.username
+                prof = m.name
         if prof=="":
             logging.warn(f"No maintainer found for group: {subgroup.full_path}")
             continue
@@ -54,7 +54,7 @@ def build_from_git(gitlab_host, token, project_type, school_year, profs_list, pa
             if config!=None:
                 config.seek(0)
             projetu = Projetu(page_template_file,
-                            project.namespace['name'], config)
+                            prof, config)
 
             tar = io.BytesIO(project.repository_archive())
             tar_base = f"{project.path}-{project.default_branch}-{commit_id}"
@@ -72,7 +72,7 @@ def build_from_git(gitlab_host, token, project_type, school_year, profs_list, pa
                             except Exception as e:
                                 logging.warn(e)
                                 continue
-                        if projetu.meta['type'] == ProjectType[project_type].value and projetu.meta['school_year'] == school_year:
+                        if projetu.meta['type'] == ProjectType[project_type].value and projetu.meta['academic_year'] == academic_year:
                             with open(path.with_suffix('.tex'), "wt") as f:
                                 f.write(tex_file.read())
 
@@ -84,7 +84,7 @@ def build_from_git(gitlab_host, token, project_type, school_year, profs_list, pa
                                 'meta': projetu.meta
                             })
                         else:
-                            logging.info(f"Project \"{projetu.meta['title']}\" not included. Type: {projetu.meta['type']} - {projetu.meta['school_year']}")
+                            logging.info(f"Project \"{projetu.meta['title']}\" not included. Type: {projetu.meta['type']} - {projetu.meta['academic_year']}")
     return project_list
 
 
@@ -120,12 +120,12 @@ def build_from_cache(project_list, page_template_file, config):
 @click.option('--token', type=str, required=True)
 @click.option('--profs', type=click.File('r'), default=None)
 @click.option('--type','project_type', type=click.Choice(list(map(lambda x: x.name, ProjectType))),default="tb")
-@click.option('--school-year', 'school_year', type=str, default="2021/2022")
+@click.option('--school-year', 'academic_year', type=str, default="2021/2022")
 @click.option('--output', type=str, default="booklet_2020")
 @click.option('--filter', 'project_filter', type=click.File(), default=None)
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
-def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, school_year, output, project_filter, debug, from_cache):
+def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache):
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -142,7 +142,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         build_from_cache(project_list, page_template_file, config)
     else:
         project_list = build_from_git(
-            gitlab_host, token, project_type, school_year, profs_list, page_template_file, config)
+            gitlab_host, token, project_type, academic_year, profs_list, page_template_file, config)
         with open(Path(output).with_suffix(".pickle"), "wb") as f:
             pickle.dump(project_list, f)
 
@@ -157,7 +157,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         filter_map = dict()
         projects_reader = csv.DictReader(project_filter)
         for row in projects_reader:
-            filter_map[(row['name'], row[PROFESSEUR])] = row
+            filter_map[(row['name'], row['author'])] = row
         logging.debug(filter_map)
         filtered_list = list()
         done_keys = set()
@@ -167,12 +167,12 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
                 done_keys.add(key)
                 item = filter_map[key]
                 logging.info("Adding project : %s (%s)", key[0], key[1])
-                students = [x.strip() for x in item[ATTRIBUE_A].split(",")]
-                if not ATTRIBUE_A in p['meta']:
-                    p['meta'][ATTRIBUE_A] = list()
-                if p['meta'][ATTRIBUE_A] != students:
-                    logging.info("Fixing attribution : %s -> %s", p['meta'][ATTRIBUE_A], students)
-                    p['meta'][ATTRIBUE_A] = students
+                students = [x.strip() for x in item['assigned_to'].split(",")]
+                if not 'assigned_to' in p['meta']:
+                    p['meta']['assigned_to'] = list()
+                if p['meta']['assigned_to'] != students:
+                    logging.info("Fixing attribution : %s -> %s", p['meta']['assigned_to'], students)
+                    p['meta']['assigned_to'] = students
                 filtered_list.append(p)
 
         for key in filter_map.keys():
@@ -186,8 +186,12 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         'basedir': Path(__file__).parent,
         'projects': project_list,
         'project_type': ProjectType[project_type].value,
-        'school_year': school_year
+        'academic_year': academic_year
     }
+
+    for p in project_list:
+        if 'professors' in p['meta']:
+            p['meta']['professors'] = (list(set(p['meta']['professors'])-set([p['author']])))
 
     with open(Path(output).with_suffix(".csv"), 'w', newline='') as csvfile:
         projects_writer = csv.writer(csvfile)

@@ -16,20 +16,22 @@ Voici la marche à suivre pour proposer des projets:
 
   ```
   ---
-  version: 2
-  titre: Mon super projet
-  type de projet: Projet de bachelor
-  année scolaire: 2019/2020
-  filières:
+  version: 3
+  title: Mon super projet
+  type: Projet de bachelor
+  academic_year: 2019/2020
+  departments:
     - Informatique
     - Télécommunications
-  nombre d'étudiants: 1
-  professeurs co-superviseurs:
+  orientations:
+    - Internet et communication
+  max_students: 1
+  professorss:
     - Philippe Joye
-  mots-clé: [IoT, Réseaux, Machine Learning]
-  langue: [F]
-  confidentialité: non
-  suite: non
+  keywords: [IoT, Réseaux, Machine Learning]
+  language: [F]
+  confidential: non
+  continuation: non
   ---
   ## Contexte
 

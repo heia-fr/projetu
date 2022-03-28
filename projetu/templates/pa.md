@@ -11,7 +11,7 @@
 
 ```{=latex}
 \begin{center}
-{\Large\textbf{\VAR{meta["type de projet"]} - \VAR{meta["année scolaire"]}}} 
+{\Large\textbf{\VAR{meta["type"]} - \VAR{meta["academic_year"]}}} 
 \end{center}
 \medskip
 

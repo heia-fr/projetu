@@ -10,7 +10,7 @@ mapping:
     - Projet de semestre 6
     - Projet de bachelor
     required: True
-  school_year:
+  academic_year:
     type: str
     required: True
     pattern: \d{4}/\d{4}
@@ -84,6 +84,14 @@ mapping:
   confidential:
     type: bool
     required: True
+  realized:
+    type: str
+    enum:
+      - labo
+      - entreprise
+      - étranger
+      - instituts externe
+    required: False
   keywords:
     type: seq
     sequence:
