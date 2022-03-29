@@ -11,7 +11,7 @@
 
 ```{=latex}
 \begin{center}
-{\Large\textbf{\VAR{meta.type_full} - \VAR{meta.academic_year}}} 
+{\Large\textbf{\VAR{type_full} - \VAR{meta.academic_year}}} 
 \end{center}
 \medskip
 

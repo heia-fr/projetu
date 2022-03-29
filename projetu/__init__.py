@@ -91,9 +91,9 @@ class Projetu:
         if not Path.exists(schema_file):
             raise Exception (f"Version {meta_map['version']} does not exist.")
         Core(source_data=meta_map, schema_files=[str(schema_file)]).validate()
-        self.meta['type_full'] = ProjectType[self.meta['type']].value
         data = dict()
         data['meta'] = meta_map
+        data['type_full'] = ProjectType[self.meta['type']].value
         data['config'] = self.config_map
         data['author'] = self.author
         data['basedir'] = self.base_dir.resolve()
@@ -109,7 +109,7 @@ class Projetu:
 
         return io.StringIO(rendered_data)
 
-    def run_pandoc(self, markdown, tmp_dir=".", standalone=True):
+    def run_pandoc(self, markdown, tmp_dir=".", standalone=True, additionnal_resource_path=None):
 
         tmp_md = tempfile.NamedTemporaryFile(
             dir=tmp_dir,
@@ -134,7 +134,7 @@ class Projetu:
         cmd = [
             "pandoc",
             tmp_md.name,
-            "--from", "markdown+link_attributes+raw_tex",
+            "--from", "markdown+link_attributes+raw_tex+implicit_figures",
             "-t", "latex",
             f"--resource-path", f".:{Path(__file__).parent / 'resources'}",
             "-V", "linkcolor:blue",
@@ -148,11 +148,16 @@ class Projetu:
         ]
         if standalone:
             cmd += [
+                "--include-in-header", self.base_dir/"resources"/"figure_without_caption.tex",
                 "--include-in-header", self.base_dir/"resources"/"wrapfig.tex",
                 "--include-in-header", self.base_dir/"resources"/"silence.tex",
                 "--include-in-header", self.base_dir/"resources"/"chapter_break.tex",
                 "--include-in-header", self.base_dir/"resources"/"bullet_style.tex",
                 "--standalone",
+            ]
+        if additionnal_resource_path is not None:
+            cmd += [
+                "--resource-path", additionnal_resource_path,
             ]
 
         res = subprocess.call(cmd)

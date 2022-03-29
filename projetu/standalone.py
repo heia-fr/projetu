@@ -1,4 +1,5 @@
 import logging
+import os
 
 import click
 
@@ -22,7 +23,9 @@ def cli(template_file, author, config, project_type, academic_year, debug, input
 
     p = Projetu(template_file, author, config)
 
+    base_dir = os.getcwd()
     for i in input_files:
+        os.chdir(Path(i.name).parent.absolute())
         logging.info("Processing %s", i.name)
         stem = Path(i.name).stem
         rendered_data = p.mark_down(i)
@@ -35,7 +38,7 @@ def cli(template_file, author, config, project_type, academic_year, debug, input
             with open(f"{stem}.tex", "wt") as f:
                 f.write(tex_file.read())
 
-            with open(f"{stem}.pdf", "wb") as f:
+            with open(f"{base_dir}/{stem}.pdf", "wb") as f:
                 f.write(pdf_file.read())
 
         

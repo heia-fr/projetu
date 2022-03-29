@@ -75,12 +75,10 @@ Voici la marche à suivre pour proposer des projets:
   ```
 
   Pour insérer une image, ajoutez l'image à votre projet et faites-y
-  référence de la manière suivante (par exemple ici avec une image qui prendra 70% de la largeur du texte):
+  référence de la manière suivante (par exemple ici avec une image qui prendra 70% de la largeur du texte) (pour être centrée l'image doit avoir une légende mais on peut "tricher" en y mettant une espace insécable `&nbsp;`):
 
-      ```{=tex}
-      \begin{center}
-      \includegraphics[width=0.7\textwidth]{img/pro.jpg}
-      \end{center}
+      ```
+      ![&nbsp;](img/coffee.jpg){width=70%}
       ```
 
 - Définissez un fichier `.gitlab-ci.yml` avec le contenu suivant:
@@ -95,7 +93,7 @@ build:
     paths:
       - ./*.pdf
 ```
-  - A chaque fois que vous ferez un `git commit` et que vous enverrez les changements sur gitlab (avec un `git push`), le CI/CD de gitlab produira les PDFs correspondants à vous fichiers. Assurez-vous que la compilation ne produise pas d'erreur.
+  - A chaque fois que vous ferez un `git commit` et que vous enverrez les changements sur gitlab (avec un `git push`), le CI/CD de gitlab produira les PDFs correspondants à vous fichiers. Assurez-vous que la compilation ne produise pas d'erreur.
   
 ## Exemple
 

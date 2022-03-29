@@ -81,6 +81,11 @@ pdfcreator={LaTeX via pandoc}}
 \setcounter{secnumdepth}{0}
 \usepackage{enumitem}
 \usepackage{amsfonts}
+\usepackage{caption}
+	\captionsetup[figure]{
+      name=,
+      labelsep=none,
+      labelformat=empty}
 
 \setlist[itemize,1]{label=$\bullet$}
 \setlist[itemize,2]{label=$\circ$}

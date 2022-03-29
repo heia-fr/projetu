@@ -87,7 +87,8 @@ def build_from_cache(project_list, page_template_file, config):
         projects[p['author']].append(p)
 
     for author, project_list in projects.items():
-        config.seek(0)
+        if config!=None:
+            config.seek(0)
         projetu = Projetu(page_template_file, author, config)
         for p in project_list:
             path = Path(p['full_path'])
