@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
   texlive-latex-recommended \
   texlive-xetex \
   texlive-lang-french \
+  xindy \
   wget \
   wkhtmltopdf
 
