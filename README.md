@@ -90,7 +90,7 @@ image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
 
 build:
   script:
-    find . -type f | grep \.md$ | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb_v2.md --academic-year=2021/2022 --type=tb
+    find . -type f | grep \.md$ | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=v2.md --academic-year=2021/2022 --type=tb
   artifacts:
     paths:
       - ./*.pdf
