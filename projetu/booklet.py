@@ -7,22 +7,15 @@ import pickle
 import tarfile
 from pathlib import Path
 import yaml
-from enum import Enum,unique
 
 import click
 import gitlab
 
-from . import Projetu
+from . import Projetu,ProjectType
 
 CONTEXT_SETTINGS = dict(
     auto_envvar_prefix='PROJETU'
 )
-
-@unique
-class ProjectType(Enum):
-    ps5 = "Projet de semestre 5"
-    ps6 = "Projet de semestre 6"
-    tb = "Projet de bachelor"
 
 def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, page_template_file, config):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
@@ -72,7 +65,7 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
                             except Exception as e:
                                 logging.warn(e)
                                 continue
-                        if projetu.meta['type'] == ProjectType[project_type].value and projetu.meta['academic_year'] == academic_year:
+                        if projetu.meta['type'] == project_type and projetu.meta['academic_year'] == academic_year:
                             with open(path.with_suffix('.tex'), "wt") as f:
                                 f.write(tex_file.read())
 

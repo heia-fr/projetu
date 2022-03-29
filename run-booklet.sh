@@ -1,5 +1,5 @@
 #!/bin/bash
-projetu-book --page-template=tb-page.md --template=booklet.md --type ps6 --school-year 2021/2022
+projetu-book --page-template=page.md --template=booklet.md --type tb --school-year 2021/2022
 xelatex booklet_2020.tex
 xelatex booklet_2020.tex
 xelatex booklet_2020.tex

@@ -6,9 +6,9 @@ mapping:
   type:
     type: str
     enum:
-    - Projet de semestre 5
-    - Projet de semestre 6
-    - Projet de bachelor
+    - ps5
+    - ps6
+    - tb
     required: True
   academic_year:
     type: str

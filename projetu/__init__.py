@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
+from enum import Enum,unique
 
 import jinja2
 import yaml
@@ -15,6 +16,12 @@ logger = logging.getLogger(__name__)
 
 MARK = '---'
 
+
+@unique
+class ProjectType(Enum):
+    ps5 = "Projet de semestre 5"
+    ps6 = "Projet de semestre 6"
+    tb = "Projet de bachelor"
 
 @dataclass
 class Projetu:
@@ -84,7 +91,7 @@ class Projetu:
         if not Path.exists(schema_file):
             raise Exception (f"Version {meta_map['version']} does not exist.")
         Core(source_data=meta_map, schema_files=[str(schema_file)]).validate()
-
+        self.meta['type_full'] = ProjectType[self.meta['type']].value
         data = dict()
         data['meta'] = meta_map
         data['config'] = self.config_map

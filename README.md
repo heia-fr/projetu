@@ -7,9 +7,30 @@ Système de publication des projets d'étudiants (projets de semestre, travaux d
 
 Voici la marche à suivre pour proposer des projets:
 
-- Créer un projet sur https://gitlab.forge.hefr.ch/, dans votre "namespace" (prénom.nom), avec le nom communiqué par le responsable de filière (par exemple `ps6-2019-2020`). Le projet peut être _public_, _internal_, ou alors _private_, mais dans ce dernier cas, le responsable de filière doit être ajouté aux membres du projet avec le rôle de _reporter_ (ou plus).
+- Créer un projet sur https://gitlab.forge.hefr.ch/, dans le groupe "travaux-etudiants-isc/prénom_nom" qui a été crée pour vous.
 - Pour chaque projet, rédiger un fichier **avec l'extension `.md`**. Ce fichier se compose de deux parties:
-  - Un "front matter" en _YAML_ avec les méta données du projet. Cette partie doit respecter le schéma [Kwalify](http://www.kuwata-lab.com/kwalify/) suivant : https://gitlab.forge.hefr.ch/jacques.supcik/projetu/-/blob/master/projetu/schemas/meta_v2.yml
+  - Un "front matter" en _YAML_ avec les méta données du projet. Cette partie doit respecter le schéma [Kwalify](http://www.kuwata-lab.com/kwalify/) suivant : https://gitlab.forge.hefr.ch/damien.goetschi/projetu/-/blob/master/projetu/schemas/meta_v3.yml
+    Liste des champs:
+    | Nom du champ | Obligatoire? | Type |
+    |--------------|--------------|------|
+    | version      | Oui          | int  |
+    | academic_year| Oui          | string format 2021/2022 |
+    | type         | Oui          | enum (ps5, ps6 ou tb) |
+    | title        | Oui          | string |
+    | departments  | Oui          | liste de string<br>valeurs possibles:<br> - Informatique<br> - Télécommunications<br> - ISC<br> - Informatique et Systèmes de Communication |
+    | languages    | Oui          | liste de string<br>valeurs possibles: D, F et E|
+    | confidential | Oui          | boolean (True/False)|
+    | max_students | Oui          | int (1 ou 2) |
+    | continuation | Oui          | boolean (True/False)|
+    | abbreviation | Non          | string |
+    | orientations | Non          | liste de string<br>valeurs possibles:<br> - Internet et communication<br> - Réseaux et sécurité<br> - Informatique logicielle<br> - Réseaux et Systèmes<br> - Ingénierie des données|
+    | professsors  | Non          | liste de string|
+    | assistants   | Non          | liste de string|
+    | mandantors   | Non          | liste de string|
+    | instituts    | Non          | liste de string<br>valeurs possibles: HumanTech, iCoSys, iSIS, ENERGY, ChemTech, iPrint, iRAP, iTEC, SeSi et TRANSFORM|
+    | realized     | Non          | string<br>valeurs possibles: labo, entreprise, étranger et instituts externe |
+    | keywords     | Non          | liste de string |
+    | assigned_to  | Non          | liste de string |
   - La donnée du projet en markdown avec des sections telles que "Contexte", "Objectifs", "Contraintes".
   
   Voici un exemple pour un tel fichier
@@ -18,20 +39,20 @@ Voici la marche à suivre pour proposer des projets:
   ---
   version: 3
   title: Mon super projet
-  type: Projet de bachelor
-  academic_year: 2019/2020
+  type: tb
+  academic_year: 2021/2022
   departments:
     - Informatique
     - Télécommunications
   orientations:
     - Internet et communication
   max_students: 1
-  professorss:
+  professors:
     - Philippe Joye
   keywords: [IoT, Réseaux, Machine Learning]
   language: [F]
-  confidential: non
-  continuation: non
+  confidential: False
+  continuation: False
   ---
   ## Contexte
 
@@ -69,7 +90,7 @@ image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
 
 build:
   script:
-    find . -type f | grep \.md$ | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb_v2.md
+    find . -type f | grep \.md$ | grep -v README | xargs projetu --author="$GITLAB_USER_NAME" --template=tb_v2.md --academic-year=2021/2022 --type=tb
   artifacts:
     paths:
       - ./*.pdf
@@ -104,16 +125,17 @@ gitlab, vous pouvez utiliser l'image Docker de la manière suivante:
 2.  Télécharger l'image Docker pour _projetu_
     ```
     docker login registry.forge.hefr.ch
-    docker pull registry.forge.hefr.ch/jacques.supcik/projetu
+    docker pull registry.forge.hefr.ch/damien.goetschi/projetu
     ```
 3.  Compiler vos fichiers
     ```
     docker run --rm -ti -v $(pwd):/src -w "/src" \
-      registry.forge.hefr.ch/jacques.supcik/projetu \
+      registry.forge.hefr.ch/damien.goetschi/projetu \
       bash -c "ls *.md | grep -v README | xargs \
         projetu --author=\"$(whoami)\" \
           --template=tb.md \
-          --config /app/tb-2019-2020.yml"
+          --config /app/tb-2019-2020.yml \
+           --academic-year=2021/2022 --type=tb"
     ```
     ou alors, pour un seul fichier à la fois:
     ```
@@ -121,6 +143,7 @@ gitlab, vous pouvez utiliser l'image Docker de la manière suivante:
       registry.forge.hefr.ch/jacques.supcik/projetu \
       projetu --author="MY NAME" \
         --template=tb.md --config /app/tb-2019-2020.yml \
+         --academic-year=2021/2022 --type=tb \
         MY_PROJECT_FILE.md
     ```
 
@@ -153,7 +176,7 @@ pouvez y remédier en corrigeant les images dans le pipeline du CI/CD à l'aide 
 votre `.gitlab-ci.yml` pourrait alors ressembler à ça:
 
 ```
-image: "registry.forge.hefr.ch/jacques.supcik/projetu:latest"
+image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
 
 build:
   script:
