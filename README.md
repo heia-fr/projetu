@@ -50,7 +50,7 @@ Voici la marche à suivre pour proposer des projets:
   professors:
     - Philippe Joye
   keywords: [IoT, Réseaux, Machine Learning]
-  language: [F]
+  languages: [F]
   confidential: False
   continuation: False
   ---
@@ -77,9 +77,7 @@ Voici la marche à suivre pour proposer des projets:
   Pour insérer une image, ajoutez l'image à votre projet et faites-y
   référence de la manière suivante (par exemple ici avec une image qui prendra 70% de la largeur du texte) (pour être centrée l'image doit avoir une légende mais on peut "tricher" en y mettant une espace insécable `&nbsp;`):
 
-      ```
       ![&nbsp;](img/coffee.jpg){width=70%}
-      ```
 
 - Définissez un fichier `.gitlab-ci.yml` avec le contenu suivant:
 
