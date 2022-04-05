@@ -37,8 +37,12 @@ def cli(gitlab_host, token, group_path, profs_file, debug):
     # get group id for group path in params
     group_id = -1
     for group in gl.groups.list(search=group_path):
-        if group.path==group_path:
+        if group.path == group_path:
             group_id = group.id
+            break
+        if group.full_path.startswith(group_path) and group.full_path.count('/')==1:
+            group_id = group.parent_id
+            break
     if group_id==-1:
         logging.error(f"Group '{group_path}' not found")
         return

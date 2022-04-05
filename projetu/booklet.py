@@ -59,7 +59,9 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
                     if len(path.parts) >= 2 and path.suffix == ".md" and path.name != "README.md":
                         with open(path) as f:
                             try:
-                                rendered_data = projetu.mark_down(f)
+                                rendered_data,err = projetu.mark_down(f)
+                                if err is not None:
+                                    continue
                                 tex_file = projetu.run_pandoc(
                                     rendered_data, standalone=False)
                             except Exception as e:
@@ -96,6 +98,8 @@ def build_from_cache(project_list, page_template_file, config):
                 try:
                     print(p['meta'])
                     rendered_data = projetu.mark_down(f, meta_map=p['meta'])
+                    if err is not None:
+                        continue
                     tex_file = projetu.run_pandoc(
                         rendered_data, standalone=False)
                 except Exception as e:
@@ -183,9 +187,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         'academic_year': academic_year
     }
 
-    for p in project_list:
-        if 'professors' in p['meta']:
-            p['meta']['professors'] = (list(set(p['meta']['professors'])-set([p['author']])))
+    
 
     with open(Path(output).with_suffix(".csv"), 'w', newline='') as csvfile:
         projects_writer = csv.writer(csvfile)

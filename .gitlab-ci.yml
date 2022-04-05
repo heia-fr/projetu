@@ -24,15 +24,15 @@ create-booklet:
   stage: build
   when: manual
   script: 
-    - projetu-book --page-template=page.md --template=booklet.md --type tb --school-year 2021/2022 --token $GITLAB_TOKEN
-    - xelatex booklet_2020.tex
-    - xelatex booklet_2020.tex
-    - xelatex booklet_2020.tex
-    - makeindex booklet_2020
-    - texindy -L french -C utf8 booklet_2020.idx
-    - xelatex booklet_2020.tex
-    - xelatex booklet_2020.tex
-    - xelatex booklet_2020.tex
+    - projetu-book --page-template=page.md --template=booklet.md --type tb --school-year 2021/2022 --token $GITLAB_TOKEN --output $DOC_NAME
+    - xelatex $DOC_NAME.tex
+    - xelatex $DOC_NAME.tex
+    - xelatex $DOC_NAME.tex
+    - makeindex $DOC_NAME
+    - texindy -L french -C utf8 $DOC_NAME.idx
+    - xelatex $DOC_NAME.tex
+    - xelatex $DOC_NAME.tex
+    - xelatex $DOC_NAME.tex
   artifacts:
     paths:
       - ./*.pdf

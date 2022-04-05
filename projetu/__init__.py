@@ -85,12 +85,17 @@ class Projetu:
             meta_map = yaml.load(meta, Loader=yaml.FullLoader)
 
         self.meta = meta_map
+        if meta_map['version']<3:
+            logger.warning(f"File {input_file.name} will be ignoring because it uses an older version of front matter.")
+            return None,"Error"
         logger.debug(meta)
 
         schema_file = self.base_dir/f"schemas/meta_v{meta_map['version']}.yml"
         if not Path.exists(schema_file):
             raise Exception (f"Version {meta_map['version']} does not exist.")
         Core(source_data=meta_map, schema_files=[str(schema_file)]).validate()
+        if 'professors' in meta_map:
+            meta_map['professors'] = (list(set(meta_map['professors'])-set([self.author])))
         data = dict()
         data['meta'] = meta_map
         data['type_full'] = ProjectType[self.meta['type']].value
@@ -107,7 +112,7 @@ class Projetu:
             logger.debug(l)
         logger.debug('---------- END RENDERED DATA ----------')
 
-        return io.StringIO(rendered_data)
+        return io.StringIO(rendered_data),None
 
     def run_pandoc(self, markdown, tmp_dir=".", standalone=True, additionnal_resource_path=None):
 

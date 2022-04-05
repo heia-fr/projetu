@@ -25,10 +25,13 @@ def cli(template_file, author, config, project_type, academic_year, debug, input
 
     base_dir = os.getcwd()
     for i in input_files:
+        os.chdir(base_dir)
         os.chdir(Path(i.name).parent.absolute())
         logging.info("Processing %s", i.name)
         stem = Path(i.name).stem
-        rendered_data = p.mark_down(i)
+        rendered_data,err = p.mark_down(i)
+        if err is not None:
+            continue
         if p.meta['type'] == project_type and p.meta['academic_year'] == academic_year:
             tex_file = p.run_pandoc(rendered_data)
             pdf_file = p.run_latex(tex_file, stem)

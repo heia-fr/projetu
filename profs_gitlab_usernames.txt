@@ -19,3 +19,4 @@ jacques.supcik
 jean-frederic.wagen
 Beat.Wolf
 luca.haab
+patrick.gaillet
