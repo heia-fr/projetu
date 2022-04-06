@@ -1,4 +1,6 @@
-FROM python:latest
+FROM python:3.10-bullseye
+ARG TARGETPLATFORM
+
 LABEL maintainer="jacques.supcik@hefr.ch"
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,6 +14,7 @@ RUN apt-get update && apt-get install -y \
   exiv2 \
   git \
   libimage-exiftool-perl \
+  pandoc \
   texlive-latex-extra \
   texlive-latex-recommended \
   texlive-xetex \
@@ -19,11 +22,6 @@ RUN apt-get update && apt-get install -y \
   xindy \
   wget \
   wkhtmltopdf
-
-# Install latest version of pandoc
-WORKDIR /tmp
-RUN wget -q https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-1-amd64.deb
-RUN dpkg -i pandoc-2.9.2.1-1-amd64.deb
 
 # Install fonts
 COPY fonts/ /usr/local/share/fonts/
