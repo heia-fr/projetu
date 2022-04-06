@@ -4,6 +4,7 @@ import io
 import logging
 import os
 import pickle
+from re import sub
 import tarfile
 from pathlib import Path
 import yaml
@@ -16,6 +17,60 @@ from . import Projetu,ProjectType
 CONTEXT_SETTINGS = dict(
     auto_envvar_prefix='PROJETU'
 )
+
+def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year, page_template_file):
+    project_list = list()
+    subgroups = group.subgroups.list()
+    for sg in subgroups:
+        project_list+=get_projects_recursive(gitlab_instance,gitlab_instance.groups.get(sg.id),prof, project_type, academic_year, page_template_file)
+    projects = group.projects.list()
+    project: gitlab.base.RESTObject
+    for gp in projects:
+        project = gitlab_instance.projects.get(gp.id)
+        logging.info("Project path : %s", project.path)
+        logging.debug("Author : %s", prof)
+        try:
+            branch = project.branches.get(project.default_branch)
+        except Exception as e:
+            logging.error(e)
+            continue
+
+        commit_id = branch.commit['id']
+        projetu = Projetu(page_template_file, prof,None)
+
+        tar = io.BytesIO(project.repository_archive())
+        tar_base = f"{project.path}-{project.default_branch}-{commit_id}"
+        logging.info("Downloading files to %s", tar_base)
+        with tarfile.open(fileobj=tar) as t:
+            t.extractall()
+            for file in t.getmembers():
+                path = Path(file.name)
+                if len(path.parts) >= 2 and path.suffix == ".md" and path.name != "README.md":
+                    with open(path) as f:
+                        try:
+                            rendered_data,err = projetu.mark_down(f)
+                            if err is not None:
+                                continue
+                            tex_file = projetu.run_pandoc(
+                                rendered_data, standalone=False)
+                        except Exception as e:
+                            logging.warn(e)
+                            continue
+                    if projetu.meta['type'] == project_type and projetu.meta['academic_year'] == academic_year:
+                        with open(path.with_suffix('.tex'), "wt") as f:
+                            f.write(tex_file.read())
+
+                        project_list.append({
+                            'path': path.parent,
+                            'name': path.stem,
+                            'full_path': path,
+                            'author': prof,
+                            'meta': projetu.meta
+                        })
+                    else:
+                        logging.info(f"Project \"{projetu.meta['title']}\" not included. Type: {projetu.meta['type']} - {projetu.meta['academic_year']}")
+    return project_list
+
 
 def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, page_template_file, config):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
@@ -31,55 +86,7 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
         if prof=="":
             logging.warn(f"No maintainer found for group: {subgroup.full_path}")
             continue
-        projects = subgroup.projects.list()
-        project: gitlab.base.RESTObject
-        for gp in projects:
-            project = gl.projects.get(gp.id)
-            logging.info("Project path : %s", project.path)
-            logging.debug("Author : %s", prof)
-            try:
-                branch = project.branches.get(project.default_branch)
-            except Exception as e:
-                logging.error(e)
-                continue
-
-            commit_id = branch.commit['id']
-            if config!=None:
-                config.seek(0)
-            projetu = Projetu(page_template_file,
-                            prof, config)
-
-            tar = io.BytesIO(project.repository_archive())
-            tar_base = f"{project.path}-{project.default_branch}-{commit_id}"
-            logging.info("Downloading files to %s", tar_base)
-            with tarfile.open(fileobj=tar) as t:
-                t.extractall()
-                for file in t.getmembers():
-                    path = Path(file.name)
-                    if len(path.parts) >= 2 and path.suffix == ".md" and path.name != "README.md":
-                        with open(path) as f:
-                            try:
-                                rendered_data,err = projetu.mark_down(f)
-                                if err is not None:
-                                    continue
-                                tex_file = projetu.run_pandoc(
-                                    rendered_data, standalone=False)
-                            except Exception as e:
-                                logging.warn(e)
-                                continue
-                        if projetu.meta['type'] == project_type and projetu.meta['academic_year'] == academic_year:
-                            with open(path.with_suffix('.tex'), "wt") as f:
-                                f.write(tex_file.read())
-
-                            project_list.append({
-                                'path': path.parent,
-                                'name': path.stem,
-                                'full_path': path,
-                                'author': prof,
-                                'meta': projetu.meta
-                            })
-                        else:
-                            logging.info(f"Project \"{projetu.meta['title']}\" not included. Type: {projetu.meta['type']} - {projetu.meta['academic_year']}")
+        project_list+=get_projects_recursive(gl, subgroup, prof, project_type, academic_year, page_template_file)
     return project_list
 
 
