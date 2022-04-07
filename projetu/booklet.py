@@ -1,5 +1,6 @@
 import collections
 import csv
+from ctypes.wintypes import tagPOINT
 import io
 import logging
 import os
@@ -18,11 +19,11 @@ CONTEXT_SETTINGS = dict(
     auto_envvar_prefix='PROJETU'
 )
 
-def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year, page_template_file):
+def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year, page_template_file,tag=None):
     project_list = list()
     subgroups = group.subgroups.list()
     for sg in subgroups:
-        project_list+=get_projects_recursive(gitlab_instance,gitlab_instance.groups.get(sg.id),prof, project_type, academic_year, page_template_file)
+        project_list+=get_projects_recursive(gitlab_instance,gitlab_instance.groups.get(sg.id),prof, project_type, academic_year, page_template_file,tag)
     projects = group.projects.list()
     project: gitlab.base.RESTObject
     for gp in projects:
@@ -30,15 +31,18 @@ def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_
         logging.info("Project path : %s", project.path)
         logging.debug("Author : %s", prof)
         try:
-            branch = project.branches.get(project.default_branch)
+            if tag is not None:
+                taginfo = project.tags.get(id=tag)
+                commit_id = taginfo.commit['id']
+            else:
+                branch = project.branches.get(project.default_branch)
+                commit_id = branch.commit['id']
         except Exception as e:
             logging.error(e)
             continue
 
-        commit_id = branch.commit['id']
         projetu = Projetu(page_template_file, prof,None)
-
-        tar = io.BytesIO(project.repository_archive())
+        tar = io.BytesIO(project.repository_archive(sha=commit_id))
         tar_base = f"{project.path}-{project.default_branch}-{commit_id}"
         logging.info("Downloading files to %s", tar_base)
         with tarfile.open(fileobj=tar) as t:
@@ -72,7 +76,7 @@ def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_
     return project_list
 
 
-def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, page_template_file, config):
+def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, page_template_file, tag=None):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
     project_list = list()
     main_group = gl.groups.get(3063)
@@ -86,7 +90,7 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
         if prof=="":
             logging.warn(f"No maintainer found for group: {subgroup.full_path}")
             continue
-        project_list+=get_projects_recursive(gl, subgroup, prof, project_type, academic_year, page_template_file)
+        project_list+=get_projects_recursive(gl, subgroup, prof, project_type, academic_year, page_template_file, tag)
     return project_list
 
 
@@ -130,7 +134,8 @@ def build_from_cache(project_list, page_template_file, config):
 @click.option('--filter', 'project_filter', type=click.File(), default=None)
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
-def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache):
+@click.option('--tag', type=str, default=None)
+def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag):
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -147,7 +152,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         build_from_cache(project_list, page_template_file, config)
     else:
         project_list = build_from_git(
-            gitlab_host, token, project_type, academic_year, profs_list, page_template_file, config)
+            gitlab_host, token, project_type, academic_year, profs_list, page_template_file, tag)
         with open(Path(output).with_suffix(".pickle"), "wb") as f:
             pickle.dump(project_list, f)
 
