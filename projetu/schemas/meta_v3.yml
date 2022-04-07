@@ -9,6 +9,7 @@ mapping:
     - ps5
     - ps6
     - tb
+    - ignore
     required: True
   academic_year:
     type: str
