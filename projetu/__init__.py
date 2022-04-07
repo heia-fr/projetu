@@ -22,6 +22,7 @@ class ProjectType(Enum):
     ps5 = "Projet de semestre 5"
     ps6 = "Projet de semestre 6"
     tb = "Projet de bachelor"
+    ignore = "ignore it"
 
 @dataclass
 class Projetu:
