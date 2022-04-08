@@ -233,7 +233,38 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
                 ", ".join(clean_list(p['meta'].get('assistants', []))),
                 ", ".join(clean_list(p['meta'].get('assigned_to', []))),
             ])
+    with open(Path(output+"_not_assigned").with_suffix(".csv"), 'w', newline='') as csvfile:
+        projects_writer = csv.writer(csvfile)
+        projects_writer.writerow([
+            'path',
+            'name',
+            'professor',
+            'title',
+            'departments',
+            'orientations',
+            'languages',
+            'max_students',
+            'professors',
+            'assistants',
+            'assigned_to',
+        ])
 
+        
+        for p in project_list:
+            if(len(clean_list(p['meta'].get('assigned_to', [])))==0):
+                projects_writer.writerow([
+                    p['path'],
+                    p['name'],
+                    p['author'],
+                    p['meta']['title'],
+                    ", ".join(clean_list(p['meta'].get('departments', []))),
+                    ", ".join(clean_list(p['meta'].get('orientations', []))),
+                    ", ".join(clean_list(p['meta'].get('languages', []))),
+                    p['meta']['max_students'],
+                    ", ".join(clean_list(p['meta'].get('professors', []))),
+                    ", ".join(clean_list(p['meta'].get('assistants', []))),
+                    "",
+                ])
     template = Projetu.jinja_env.get_template(template_file)
     rendered_data = template.render(data)
     with open(Path(output).with_suffix(".tex"), "wt") as f:
