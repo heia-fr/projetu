@@ -36,3 +36,4 @@ create-booklet:
   artifacts:
     paths:
       - ./*.pdf
+      - ./*.csv
