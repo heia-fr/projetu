@@ -21,10 +21,10 @@ CONTEXT_SETTINGS = dict(
 
 def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year, page_template_file,tag=None):
     project_list = list()
-    subgroups = group.subgroups.list()
+    subgroups = group.subgroups.list(all=True)
     for sg in subgroups:
         project_list+=get_projects_recursive(gitlab_instance,gitlab_instance.groups.get(sg.id),prof, project_type, academic_year, page_template_file,tag)
-    projects = group.projects.list()
+    projects = group.projects.list(all=True)
     project: gitlab.base.RESTObject
     for gp in projects:
         project = gitlab_instance.projects.get(gp.id)
@@ -80,11 +80,11 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
     project_list = list()
     main_group = gl.groups.get(3063)
-    subgroups = main_group.subgroups.list()
+    subgroups = main_group.subgroups.list(all=True)
     for sg in subgroups:
         prof = ""
         subgroup = gl.groups.get(sg.id)
-        for m in subgroup.members.list():
+        for m in subgroup.members.list(all=True):
             if m.access_level == gitlab.const.MAINTAINER_ACCESS:
                 prof = m.name
         if prof=="":
