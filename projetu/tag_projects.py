@@ -5,10 +5,10 @@ import gitlab
 
 def add_tag_recursive(gitlab_instance, group_id, tag, override_tag=False):
     group = gitlab_instance.groups.get(group_id)
-    subgroups = group.subgroups.list()
+    subgroups = group.subgroups.list(all=True)
     for sg in subgroups:
         add_tag_recursive(gitlab_instance,sg.id,tag)
-    projects = group.projects.list()
+    projects = group.projects.list(all=True)
     project: gitlab.base.RESTObject
     for gp in projects:
         project = gitlab_instance.projects.get(gp.id)
