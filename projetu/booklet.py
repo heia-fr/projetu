@@ -1,3 +1,4 @@
+import codecs
 import collections
 import csv
 from ctypes.wintypes import tagPOINT
@@ -201,7 +202,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
 
     
 
-    with open(Path(output).with_suffix(".csv"), 'w', newline='') as csvfile:
+    with open(Path(output).with_suffix(".csv"), mode='w', encoding='utf-8-sig', newline='') as csvfile:
         projects_writer = csv.writer(csvfile)
         projects_writer.writerow([
             'path',
@@ -237,7 +238,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
                 ", ".join(clean_list(p['meta'].get('assistants', []))),
                 ", ".join(clean_list(p['meta'].get('assigned_to', []))),
             ])
-    with open(Path(output+"_not_assigned").with_suffix(".csv"), 'w', newline='') as csvfile:
+    with open(Path(output+"_not_assigned").with_suffix(".csv"), mode='w', encoding='utf-8-sig', newline='') as csvfile:
         projects_writer = csv.writer(csvfile)
         projects_writer.writerow([
             'path',

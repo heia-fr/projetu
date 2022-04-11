@@ -96,8 +96,10 @@ class Projetu:
             raise Exception (f"Version {meta_map['version']} does not exist.")
         Core(source_data=meta_map, schema_files=[str(schema_file)]).validate()
         if 'professors' in meta_map:
-            meta_map['professors'] = (list(set(meta_map['professors'])-set([self.author])))
-        data = dict()
+            for elem in meta_map['professors']:
+                if elem.casefold() == self.author.casefold():
+                    meta_map['professors'].remove(elem)
+        data = dict() 
         data['meta'] = meta_map
         data['type_full'] = ProjectType[self.meta['type']].value
         data['config'] = self.config_map
