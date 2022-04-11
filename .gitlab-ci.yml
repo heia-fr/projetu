@@ -24,7 +24,7 @@ create-booklet:
   stage: build
   when: manual
   script: 
-    - projetu-book --page-template=page.md --template=booklet.md --type tb --school-year 2021/2022 --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN
+    - projetu-book --page-template=page.md --template=booklet.md --type tb --school-year 2021/2022 --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN 
     - xelatex $DOC_NAME.tex
     - xelatex $DOC_NAME.tex
     - xelatex $DOC_NAME.tex
