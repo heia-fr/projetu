@@ -95,6 +95,39 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
     return project_list
 
 
+def build_expert_from_cache(project_list, page_template_file, config, updated_assignation):
+    projects = collections.defaultdict(list)
+    for p in project_list:
+        projects[p['author']].append(p)
+    all_projects = []
+    for author, project_list in projects.items():
+        if config!=None:
+            config.seek(0)
+        projetu = Projetu(page_template_file, author, config)
+        for p in project_list:
+            key = str(p['path'])+p['name']
+            if key in updated_assignation:
+                p['meta']['assigned_to'] = [updated_assignation[key]]
+            elif not 'assigned_to' in p['meta']:
+                continue
+            path = Path(p['full_path'])
+            with open(path) as f:
+                try:
+                    rendered_data,err = projetu.mark_down(f, meta_map=p['meta'])
+                    if err is not None:
+                        continue
+                    tex_file = projetu.run_pandoc(
+                        rendered_data, standalone=False)
+                except Exception as e:
+                    logging.warn(e)
+                    continue
+
+            with open(path.with_suffix('.tex'), "wt") as f:
+                f.write(tex_file.read())
+            all_projects.append(p)
+    return all_projects
+
+
 def build_from_cache(project_list, page_template_file, config):
     projects = collections.defaultdict(list)
     for p in project_list:
@@ -110,8 +143,6 @@ def build_from_cache(project_list, page_template_file, config):
                 try:
                     print(p['meta'])
                     rendered_data = projetu.mark_down(f, meta_map=p['meta'])
-                    if err is not None:
-                        continue
                     tex_file = projetu.run_pandoc(
                         rendered_data, standalone=False)
                 except Exception as e:
@@ -135,8 +166,9 @@ def build_from_cache(project_list, page_template_file, config):
 @click.option('--filter', 'project_filter', type=click.File(), default=None)
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
+@click.option('--update-assignation', 'updated_assignation', type=str, default=None)
 @click.option('--tag', type=str, default=None)
-def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag):
+def cli(page_template_file, template_file, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag, updated_assignation):
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -150,7 +182,18 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
     if from_cache:
         with open(Path(output).with_suffix(".pickle"), "rb") as f:
             project_list = pickle.load(f)
-        build_from_cache(project_list, page_template_file, config)
+        if updated_assignation is None:
+            build_from_cache(project_list, page_template_file, config)
+        else:
+            with open(Path(updated_assignation), "r") as csvfile:
+                reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+                updated_assignation_datas = {}
+                nb = 0
+                for r in reader:
+                    nb+=1
+                    if nb>2 and r[14]!="" and r[15]!="":
+                        updated_assignation_datas[r[0]+r[1]] = r[14]+" "+r[15]
+                project_list = build_expert_from_cache(project_list, page_template_file, config, updated_assignation=updated_assignation_datas)
     else:
         project_list = build_from_git(
             gitlab_host, token, project_type, academic_year, profs_list, page_template_file, tag)
@@ -199,8 +242,6 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         'project_type': ProjectType[project_type].value,
         'academic_year': academic_year
     }
-
-    
 
     with open(Path(output).with_suffix(".csv"), mode='w', encoding='utf-8-sig', newline='') as csvfile:
         projects_writer = csv.writer(csvfile)
