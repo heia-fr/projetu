@@ -23,6 +23,9 @@
 \BLOCK{ if meta.max_students }
 - Nombre maximum d'étudiant(s) : \VAR{ meta.max_students }
 \BLOCK{ endif }
+\BLOCK{ if meta.weight }
+- Poids : \VAR{ meta.weight }
+\BLOCK{ endif }
 \BLOCK{ if meta.assigned_to }
 - Attribué à : \VAR{ meta.assigned_to | join(", ") }
 \BLOCK{ endif }

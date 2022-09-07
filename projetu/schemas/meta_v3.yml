@@ -112,3 +112,6 @@ mapping:
   continuation:
     type: bool
     required: True
+  weight:
+    type: int
+    required: False

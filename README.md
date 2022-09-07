@@ -31,6 +31,7 @@ Voici la marche à suivre pour proposer des projets:
     | realized     | Non          | string<br>valeurs possibles: labo, entreprise, étranger et instituts externe |
     | keywords     | Non          | liste de string |
     | assigned_to  | Non          | liste de string |
+    | weight       | Non          | int |
   - La donnée du projet en markdown avec des sections telles que "Contexte", "Objectifs", "Contraintes".
   
   Voici un exemple pour un tel fichier

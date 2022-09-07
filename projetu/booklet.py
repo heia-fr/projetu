@@ -259,6 +259,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
             'professors',
             'assistants',
             'assigned_to',
+            'weight',
         ])
 
         
@@ -278,6 +279,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
                 ", ".join(clean_list(p['meta'].get('professors', []))),
                 ", ".join(clean_list(p['meta'].get('assistants', []))),
                 ", ".join(clean_list(p['meta'].get('assigned_to', []))),
+                p['meta']['weight'],
             ])
     with open(Path(output+"_not_assigned").with_suffix(".csv"), mode='w', encoding='utf-8-sig', newline='') as csvfile:
         projects_writer = csv.writer(csvfile)
@@ -295,6 +297,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
             'professors',
             'assistants',
             'assigned_to',
+            'weight',
         ])
 
         
@@ -314,6 +317,7 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
                     ", ".join(clean_list(p['meta'].get('professors', []))),
                     ", ".join(clean_list(p['meta'].get('assistants', []))),
                     "",
+                    p['meta']['weight'],
                 ])
     template = Projetu.jinja_env.get_template(template_file)
     rendered_data = template.render(data)
