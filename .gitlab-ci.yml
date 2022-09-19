@@ -51,6 +51,7 @@ create-booklet:
     - xelatex $DOC_NAME.tex
     - xelatex $DOC_NAME.tex
   artifacts:
+    when: always
     paths:
       - ./*.pdf
       - ./*.csv
