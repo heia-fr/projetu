@@ -1,18 +1,18 @@
 variables:
   ACADEMIC_YEAR:
-    value: $ACADEMIC_YEAR
+    value: "2022/2023"
     description: "Academic year in form 'yyyy/yyyy'"
   DOC_NAME:
-    value: $DOC_NAME
+    value: "booklet_ps5_2022-2023"
     description: "Name of output documents (pdf and csv)"
   PROJECT_TYPE:
-    value: $PROJECT_TYPE
+    value: "ps5"
     description: "Type of project to build (ps5, ps6 or tb)"
   TAG:
-    value: $TAG
+    value: "none"
     description: "Tag projects and use this tag to fetch git project (keep none to not tag projects and fetch last commit on main)"
   OVERRIDE_TAG:
-    value: $OVERRIDE_TAG
+    value: False
     description: "Override tag if projects already taged with this tag (True/False)"
 stages:
   - build
