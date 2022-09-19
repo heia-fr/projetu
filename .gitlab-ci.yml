@@ -20,6 +20,11 @@ build-kaniko:
       --destination $CI_REGISTRY_IMAGE:latest
 
 create-booklet:
+  variables:
+    ACADEMIC_YEAR: $ACADEMIC_YEAR
+    DOC_NAME: $DOC_NAME
+    PROJECT_TYPE: $PROJECT_TYPE
+    TAG: $TAG
   image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
   stage: build
   when: manual
@@ -39,6 +44,9 @@ create-booklet:
       - ./*.csv
 
 tag-projects:
+  variables:
+    TAG: $TAG
+    OVERRIDE_TAG: $OVERRIDE_TAG
   image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
   stage: build
   when: manual
