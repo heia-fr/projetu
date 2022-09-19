@@ -14,6 +14,7 @@ variables:
   OVERRIDE_TAG:
     value: "False"
     description: "Override tag if projects already taged with this tag (True/False)"
+  GITLAB_TOKEN: $GITLAB_TOKEN
 stages:
   - build
 
