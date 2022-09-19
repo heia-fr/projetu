@@ -174,7 +174,10 @@ def cli(page_template_file, template_file, config, gitlab_host, token, profs, pr
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-
+    
+    if tag is not None and tag.lower()=="none":
+        tag=None
+    
     profs_list = None
     if profs is not None:
         profs_list = yaml.load(profs, Loader=yaml.FullLoader)

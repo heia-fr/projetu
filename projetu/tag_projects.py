@@ -49,7 +49,8 @@ def cli(gitlab_host, token, group_path, tag, override, debug, project):
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-
+    if tag.lower()=="none":
+        logging.error("A tag must be provided to tag projects")
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
 
     if project is not None:

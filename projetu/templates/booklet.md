@@ -145,7 +145,7 @@ pdfcreator={LaTeX via pandoc}}
 \Huge{\textbf{\VAR{ project_type } - \VAR{ academic_year }}}
 \vspace*{1cm}
 
-\LARGE{Filières informatique et télécommunications}
+\LARGE{Informatique et systèmes de communication}
 \vspace*{2cm}
 
 \includegraphics[width=.6\textwidth]{\VAR{ basedir }/resources/isc-pic.jpg}

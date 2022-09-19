@@ -24,7 +24,7 @@ create-booklet:
   stage: build
   when: manual
   script: 
-    - projetu-book --page-template=page.md --template=booklet.md --type ps5 --school-year 2022/2023 --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN 
+    - projetu-book --page-template=page.md --template=booklet.md --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN 
     - xelatex $DOC_NAME.tex
     - xelatex $DOC_NAME.tex
     - xelatex $DOC_NAME.tex
@@ -37,3 +37,10 @@ create-booklet:
     paths:
       - ./*.pdf
       - ./*.csv
+
+tag-projects:
+  image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
+  stage: build
+  when: manual
+  script:
+    - projetu-tag --tag $TAG --overide $OVERRIDE_TAG --token $GITLAB_TOKEN
