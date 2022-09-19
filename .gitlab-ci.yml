@@ -12,7 +12,7 @@ variables:
     value: "none"
     description: "Tag projects and use this tag to fetch git project (keep none to not tag projects and fetch last commit on main)"
   OVERRIDE_TAG:
-    value: False
+    value: "False"
     description: "Override tag if projects already taged with this tag (True/False)"
 stages:
   - build
