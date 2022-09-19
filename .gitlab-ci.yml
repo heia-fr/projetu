@@ -1,3 +1,19 @@
+variables:
+  ACADEMIC_YEAR:
+    value: $ACADEMIC_YEAR
+    description: "Academic year in form 'yyyy/yyyy'"
+  DOC_NAME:
+    value: $DOC_NAME
+    description: "Name of output documents (pdf and csv)"
+  PROJECT_TYPE:
+    value: $PROJECT_TYPE
+    description: "Type of project to build (ps5, ps6 or tb)"
+  TAG:
+    value: $TAG
+    description: "Tag projects and use this tag to fetch git project (keep none to not tag projects and fetch last commit on main)"
+  OVERRIDE_TAG:
+    value: $OVERRIDE_TAG
+    description: "Override tag if projects already taged with this tag (True/False)"
 stages:
   - build
 
@@ -20,11 +36,6 @@ build-kaniko:
       --destination $CI_REGISTRY_IMAGE:latest
 
 create-booklet:
-  variables:
-    ACADEMIC_YEAR: $ACADEMIC_YEAR
-    DOC_NAME: $DOC_NAME
-    PROJECT_TYPE: $PROJECT_TYPE
-    TAG: $TAG
   image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
   stage: build
   when: manual
@@ -43,12 +54,9 @@ create-booklet:
       - ./*.pdf
       - ./*.csv
 
-tag-projects:
-  variables:
-    TAG: $TAG
-    OVERRIDE_TAG: $OVERRIDE_TAG
+tag-projects:    
   image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
   stage: build
   when: manual
   script:
-    - projetu-tag --tag $TAG --overide $OVERRIDE_TAG --token $GITLAB_TOKEN
+    - projetu-tag --tag $TAG --override $OVERRIDE_TAG --token $GITLAB_TOKEN
