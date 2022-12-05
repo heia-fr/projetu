@@ -26,5 +26,6 @@ setup(
         projetu-book=projetu.booklet:cli
         projetu-tag=projetu.tag_projects:cli
         projetu-create-subgroup=projetu.create_subgroups:cli
+        projetu-website-global=projetu.website_global:cli
     ''',
 )

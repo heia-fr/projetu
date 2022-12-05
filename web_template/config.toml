@@ -1,0 +1,6 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "Projets de semestre 6"
+theme = "hugo-book"
+[taxonomies]
+  keyword = 'keywords'

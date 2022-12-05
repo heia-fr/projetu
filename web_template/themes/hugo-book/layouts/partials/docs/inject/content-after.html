@@ -1,0 +1,20 @@
+{{ if isset .Params "showmeta" }}
+    <div class=markdown><h2 id="metadatas">Méta-données</h2>
+    <ul>
+        {{ if isset .Params "mandantors"}} <li>Mandant(s): {{ delimit .Params.mandantors ", " }}</li> {{end}}
+        {{ if and (isset .Params "confidential") (eq .Params.confidential true) }} <li><b>Projet confidentiel</b></li> {{ end }}
+        {{ if isset .Params "departments"}} <li>Filière(s): {{ delimit .Params.departments ", " }}</li> {{end}}
+        {{ if isset .Params "orientations"}} <li>Orientation(s): {{ delimit .Params.orientations ", " }}</li> {{end}}
+        {{ if isset .Params "instituts"}} <li>Instituts(s): {{ delimit .Params.instituts ", " }}</li> {{end}}
+        {{ if isset .Params "language"}} <li>Langue: {{ delimit .Params.language ", " }}</li> {{end}}
+        {{ if isset .Params "max_students"}} <li>Nombre maximum d'étudiant(s): {{ .Params.max_students }}</li> {{end}}
+        {{ if and (isset .Params "assigned_to") (not (eq .Params.assigned_to nil))}} <li>Attribué à: {{ delimit .Params.assigned_to ", " }}</li> {{end}}
+        <li>Professeur: {{ .Params.author }}</li>
+        {{ if isset .Params "professors"}} <li>Co-superviseur(s): {{ delimit .Params.professors ", " }}</li> {{end}}
+        {{ if isset .Params "assistants"}} <li>Assistants: {{ delimit .Params.assistants ", " }}</li> {{end}}
+        {{ if and (isset .Params "continuation") (eq .Params.continuation true) }} <li>Ce projet de bachelor est la suite d'un travail de semestre réalisée par le même étudiant</li> {{ end }}
+    </ul>
+
+    {{ if isset .Params "keywords"}}Mots clés: {{ delimit .Params.keywords ", " }}{{end}}
+    </div>
+{{end}}
