@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
   exiftran \
   exiv2 \
   git \
+  hugo \
   libimage-exiftool-perl \
   pandoc \
   texlive-latex-extra \
