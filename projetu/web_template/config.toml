@@ -6,6 +6,3 @@ theme = "hugo-book"
 [taxonomies]
   keyword = 'keywords'
   author = 'author'
- [markup.goldmark.parser.attribute]
-  block = true
-  title = true
