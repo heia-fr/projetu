@@ -21,7 +21,7 @@ def cli(web_template_directory, author, config, project_type, academic_year, deb
         logging.basicConfig(level=logging.INFO)
 
     p = projetu = Projetu(author,None)
-
+    
     shutil.copytree(p.base_dir/web_template_directory, "web")
 
     base_dir = os.getcwd()
@@ -41,19 +41,12 @@ def cli(web_template_directory, author, config, project_type, academic_year, deb
         if p.meta['type'] == project_type and p.meta['academic_year'] == academic_year:
             with open('./web/content/posts/'+projetu.encoded_url+'.md', "wt") as f:
                 f.write(rendered_data.read())
-                logging.info("File writed")
             # copy image(s)
-            logging.info("Start copy of images")
             for img in projetu.img_to_copy:
-                logging.info("src path")
                 srcImgPath = Path(os.path.join(path.parent, img))
-                logging.info("dst path")
                 dstImgPath = Path(os.path.join('./web/content', projetu.encoded_url, img ))
-                logging.info("mkdir dst dir")
                 dstImgPath.parent.mkdir(parents=True, exist_ok=True)
-                logging.info("SH copy")
                 shutil.copy(srcImgPath, dstImgPath)
-            logging.info("End copy of images")
 
 if __name__ == "__main__":
     cli()

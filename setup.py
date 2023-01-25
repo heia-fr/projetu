@@ -18,7 +18,15 @@ setup(
         'templates/*',
         'resources/*',
         'schemas/*',
-        'web_template/*'
+        'web_template/*',
+        'web_template/*/*',
+        'web_template/*/*/*',
+        'web_template/*/*/*/*',
+        'web_template/*/*/*/*/*',
+        'web_template/*/*/*/*/*/*',
+        'web_template/*/*/*/*/*/*/*',
+        'web_template/*/*/*/*/*/*/*/*',
+        'web_template/*/*/*/*/*/*/*/*/*'
     ]},
     zip_safe=False,
     entry_points='''
