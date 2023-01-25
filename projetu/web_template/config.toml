@@ -1,0 +1,11 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "Projets de semestre 5"
+relativeURLs = true
+theme = "hugo-book"
+[taxonomies]
+  keyword = 'keywords'
+  author = 'author'
+ [markup.goldmark.parser.attribute]
+  block = true
+  title = true

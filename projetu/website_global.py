@@ -61,9 +61,14 @@ def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_
                             logging.warn(e)
                             continue
                     if projetu.meta['type'] == project_type and projetu.meta['academic_year'] == academic_year:
-                        with open('./web/content/posts/'+projetu.url+'.md', "wt") as f:
+                        with open('./web/content/posts/'+projetu.encoded_url+'.md', "wt") as f:
                             f.write(rendered_data.read())
-
+                        # copy image(s)
+                        for img in projetu.img_to_copy:
+                            srcImgPath = Path(os.path.join(path.parent, img))
+                            dstImgPath = Path(os.path.join('./web/content', projetu.encoded_url, img ))
+                            dstImgPath.parent.mkdir(parents=True, exist_ok=True)
+                            shutil.copy(srcImgPath, dstImgPath)
                         project_list.append({
                             'path': path.parent,
                             'name': path.stem,
