@@ -1,6 +1,6 @@
 <nav>
   <h2>Filtres</h2>
-  <h3><a href="{{ ref . "_index.md" }}/index.html">Afficher tous les projets</a></h3>
+  <h3><a href="{{ relref . "_index.md" }}index.html">Afficher tous les projets</a></h3>
   <br/>
   <ul>
   {{ range $term, $_ := .Site.Taxonomies }}
