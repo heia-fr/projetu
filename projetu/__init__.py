@@ -110,7 +110,7 @@ class Projetu:
         meta_injected = data['meta']
         meta_injected['author'] = self.author
         meta_injected['showmeta'] = True
-        meta_injected['url'] = "/"+self.encoded_url
+        #meta_injected['url'] = "/"+self.encoded_url
 
         md_with_injection = MARK+"\n"+yaml.dump(meta_injected, allow_unicode=True)+MARK+"\n"+body
         return io.StringIO(md_with_injection),None
