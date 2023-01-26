@@ -1,6 +1,6 @@
 baseURL = "http://example.org/"
 languageCode = "en-us"
-title = "Projets de semestre 5"
+title = "Projets de semestre 6"
 relativeURLs = true
 uglyurls = true
 theme = "hugo-book"
