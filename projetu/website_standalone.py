@@ -22,8 +22,8 @@ def cli(web_template_directory, author, config, project_type, academic_year, deb
 
     p = projetu = Projetu(author,None)
     
-    shutil.copytree(p.base_dir/"resources/redirect_index.html", "index.html")
-    shutil.copy(p.base_dir/web_template_directory, "web")
+    shutil.copy(p.base_dir/"resources/redirect_index.html", "index.html")
+    shutil.copytree(p.base_dir/web_template_directory, "web")
 
     base_dir = os.getcwd()
     for i in input_files:
