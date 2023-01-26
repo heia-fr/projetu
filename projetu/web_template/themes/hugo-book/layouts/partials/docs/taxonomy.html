@@ -1,4 +1,7 @@
 <nav>
+  <h2>Filtres</h2>
+  <h3><a href="{{ ref . "_index.md" }}/index.html">Afficher tous les projets</a></h3>
+  <br/>
   <ul>
   {{ range $term, $_ := .Site.Taxonomies }}
     {{ with $.Site.GetPage (printf "/%s" $term | urlize) }}

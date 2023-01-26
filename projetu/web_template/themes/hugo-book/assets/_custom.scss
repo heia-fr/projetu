@@ -2,3 +2,7 @@
 
 // @import "plugins/numbered";
 figure {text-align: center;}
+
+hr:last-of-type {
+    display: none;
+}
