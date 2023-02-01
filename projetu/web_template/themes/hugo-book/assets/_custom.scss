@@ -6,3 +6,15 @@ figure {text-align: center;}
 hr:last-of-type {
     display: none;
 }
+
+@media print {
+    h1 { 
+      page-break-before: always;
+    }
+    h4 a {
+        color: black;
+    }
+    .nobreak{
+        page-break-before: avoid !important;
+    }
+}

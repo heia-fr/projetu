@@ -20,11 +20,11 @@ CONTEXT_SETTINGS = dict(
     auto_envvar_prefix='PROJETU'
 )
 
-def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year,tag=None):
+def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year,output_directory,tag=None):
     project_list = list()
     subgroups = group.subgroups.list(all=True)
     for sg in subgroups:
-        project_list+=get_projects_recursive(gitlab_instance,gitlab_instance.groups.get(sg.id),prof, project_type, academic_year,tag)
+        project_list+=get_projects_recursive(gitlab_instance,gitlab_instance.groups.get(sg.id),prof, project_type, academic_year,output_directory,tag)
     projects = group.projects.list(all=True)
     project: gitlab.base.RESTObject
     for gp in projects:
@@ -61,14 +61,17 @@ def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_
                             logging.warn(e)
                             continue
                     if projetu.meta['type'] == project_type and projetu.meta['academic_year'] == academic_year:
-                        with open('./web/content/posts/'+projetu.encoded_url+'.md', "wt") as f:
+                        with open(output_directory+'/content/posts/'+projetu.encoded_url+'.md', "wt") as f:
                             f.write(rendered_data.read())
                         # copy image(s)
                         for img in projetu.img_to_copy:
                             srcImgPath = Path(os.path.join(path.parent, img))
-                            dstImgPath = Path(os.path.join('./web/content', projetu.encoded_url, img ))
+                            dstImgPath = Path(os.path.join(output_directory, 'content', projetu.encoded_url, img ))
+                            dstImgPath2 = Path(os.path.join(output_directory, 'content', img ))
                             dstImgPath.parent.mkdir(parents=True, exist_ok=True)
+                            dstImgPath2.parent.mkdir(parents=True, exist_ok=True)
                             shutil.copy(srcImgPath, dstImgPath)
+                            shutil.copy(srcImgPath, dstImgPath2)
                         project_list.append({
                             'path': path.parent,
                             'name': path.stem,
@@ -81,7 +84,7 @@ def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_
     return project_list
 
 
-def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, tag=None):
+def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, output_directory, tag=None):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
     project_list = list()
     main_group = gl.groups.get(3063)
@@ -95,7 +98,7 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
         if prof=="":
             logging.warn(f"No maintainer found for group: {subgroup.full_path}")
             continue
-        project_list+=get_projects_recursive(gl, subgroup, prof, project_type, academic_year, tag)
+        project_list+=get_projects_recursive(gl, subgroup, prof, project_type, academic_year, output_directory, tag)
     return project_list
 
 
@@ -170,10 +173,13 @@ def build_from_cache(project_list, config):
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
 @click.option('--update-assignation', 'updated_assignation', type=str, default=None)
+@click.option('--output-directory', 'output_directory', type=str, default="web")
 @click.option('--tag', type=str, default=None)
-def cli(web_template_directory, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag, updated_assignation):
+def cli(web_template_directory, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag, updated_assignation,output_directory):
     # copy website_template to a web dir in current directpry
-    shutil.copytree(web_template_directory, "web")
+    p = projetu = Projetu("",None)
+    shutil.copy(p.base_dir/"resources/redirect_index.html", "index.html")
+    shutil.copytree(p.base_dir/web_template_directory, output_directory)
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -204,7 +210,7 @@ def cli(web_template_directory, config, gitlab_host, token, profs, project_type,
                 project_list = build_expert_from_cache(project_list, config, updated_assignation=updated_assignation_datas)
     else:
         project_list = build_from_git(
-            gitlab_host, token, project_type, academic_year, profs_list, tag)
+            gitlab_host, token, project_type, academic_year, profs_list, output_directory, tag)
         with open(Path(output).with_suffix(".pickle"), "wb") as f:
             pickle.dump(project_list, f)
 
