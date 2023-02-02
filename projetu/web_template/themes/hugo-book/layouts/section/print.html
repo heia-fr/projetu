@@ -19,10 +19,10 @@
             </center>
             <img src="images/hesso.jpg" width="30%" style="padding-top: 250px">
             <h1>Liste des projets</h1>
-            {{range .Site.RegularPages}}
+            {{range .Site.RegularPages.ByTitle}}
             <h4><a href="#{{md5 .Title}}">{{.Title}}</a></h4>
             {{end}}
-            {{range .Site.RegularPages}}
+            {{range .Site.RegularPages.ByTitle}}
             <article class="markdown">
                 <h1 id="{{md5 .Title}}">{{.Title}}</h1>
                 {{- .Content -}}

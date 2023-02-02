@@ -3,10 +3,10 @@ variables:
     value: "2022/2023"
     description: "Academic year in form 'yyyy/yyyy'"
   DOC_NAME:
-    value: "booklet_ps5_2022-2023"
-    description: "Name of output documents (pdf and csv)"
+    value: "booklet_ps6_2022-2023"
+    description: "Name of output documents (csv only)"
   PROJECT_TYPE:
-    value: "ps5"
+    value: "ps6"
     description: "Type of project to build (ps5, ps6 or tb)"
   TAG:
     value: "none"
@@ -36,28 +36,22 @@ build-kaniko:
       $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
       --destination $CI_REGISTRY_IMAGE:latest
 
-create-booklet:
-  image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
+create-website:
+  image: "registry.forge.hefr.ch/isc/projetu:latest"
   stage: build
   when: manual
   script: 
-    - projetu-book --page-template=page.md --template=booklet.md --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN 
-    - xelatex $DOC_NAME.tex
-    - xelatex $DOC_NAME.tex
-    - xelatex $DOC_NAME.tex
-    - makeindex $DOC_NAME
-    - texindy -L french -C utf8 $DOC_NAME.idx
-    - xelatex $DOC_NAME.tex
-    - xelatex $DOC_NAME.tex
-    - xelatex $DOC_NAME.tex
+    - projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN
+    - hugo -s web -d ../public
   artifacts:
     when: always
     paths:
-      - ./*.pdf
       - ./*.csv
+      - public
+      - index.html
 
 tag-projects:    
-  image: "registry.forge.hefr.ch/damien.goetschi/projetu:latest"
+  image: "registry.forge.hefr.ch/isc/projetu:latest"
   stage: build
   when: manual
   script:

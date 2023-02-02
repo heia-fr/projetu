@@ -1,5 +1,5 @@
 {{ define "main" }}
-  {{ range sort .Paginator.Pages }}
+  {{ range sort .Site.RegularPages.ByTitle }}
   <article class="markdown book-post">
     <h2> 
       <a href="{{ .RelPermalink }}">{{ partial "docs/title.html" . }}</a>
@@ -13,8 +13,6 @@
     </p>
   </article>
   {{ end }}
-
-  {{ template "_internal/pagination.html" . }}
 {{ end }}
 
 {{ define "toc" }}
