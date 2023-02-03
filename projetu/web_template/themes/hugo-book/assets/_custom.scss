@@ -7,6 +7,10 @@ hr:last-of-type {
     display: none;
 }
 
+.markdown h2{
+    line-height: 1.5;
+}
+
 @media print {
     h1 { 
       page-break-before: always;
@@ -17,4 +21,25 @@ hr:last-of-type {
     .nobreak{
         page-break-before: avoid !important;
     }
+
+    #webheader{
+        display: none;
+    }
+
+    #printheader{
+        display: inline !important;
+    }
+
+    .book-toc{
+        display: none;
+    }
+
+    .book-header{
+        display: none;
+    }
+}
+
+#printheader{
+    display: none;
+    text-align: center;
 }
