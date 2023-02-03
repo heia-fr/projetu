@@ -12,6 +12,9 @@ hr:last-of-type {
 }
 
 @media print {
+    #mainpage{
+        padding-top: 15px !important;
+    }
     h1 { 
       page-break-before: always;
     }
