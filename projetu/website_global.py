@@ -9,6 +9,7 @@ from re import sub
 import tarfile
 from pathlib import Path
 import yaml
+import hashlib
 import shutil
 
 import click
@@ -175,11 +176,12 @@ def build_from_cache(project_list, config):
 @click.option('--update-assignation', 'updated_assignation', type=str, default=None)
 @click.option('--output-directory', 'output_directory', type=str, default="web")
 @click.option('--tag', type=str, default=None)
-def cli(web_template_directory, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag, updated_assignation,output_directory):
+@click.option('--secret',type=str, default="secret")
+def cli(web_template_directory, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag, updated_assignation,output_directory,secret):
     # copy website_template to a web dir in current directpry
     p = projetu = Projetu("",None)
-    shutil.copy(p.base_dir/"resources/redirect_index.html", "index.html")
-    shutil.copytree(p.base_dir/web_template_directory, output_directory)
+    base_dir = p.base_dir
+    shutil.copytree(base_dir/web_template_directory, output_directory)
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -333,6 +335,10 @@ def cli(web_template_directory, config, gitlab_host, token, profs, project_type,
                     "",
                     p['meta']['weight'] if "weight" in p['meta'] else "",
                 ])
+    url = hashlib.md5((project_type+academic_year+secret).encode()).hexdigest()[:10]
+    os.system("hugo -s web -d ../public/"+url)
+    logging.info("URL: "+url)
+    shutil.copy(base_dir/"resources/robots.txt", "public/robots.txt")
 
 if __name__ == "__main__":
     cli()
