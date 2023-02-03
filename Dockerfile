@@ -9,7 +9,6 @@ ENV LANG=C.UTF-8
 
 # Install required software
 RUN apt-get update && apt-get install -y \
-  context \
   git \
   hugo \
   wget
