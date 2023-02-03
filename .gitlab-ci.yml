@@ -50,6 +50,18 @@ create-website:
       - public
       - index.html
 
+pages:
+  image: "registry.forge.hefr.ch/isc/projetu:latest"
+  stage: build
+  when: manual
+  script: 
+    - projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN
+    - hugo -s web -d ../public
+  artifacts:
+    when: always
+    paths:
+      - public
+
 tag-projects:    
   image: "registry.forge.hefr.ch/isc/projetu:latest"
   stage: build
