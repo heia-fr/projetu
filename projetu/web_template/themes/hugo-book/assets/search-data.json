@@ -6,7 +6,7 @@
 {{ range $index, $page := $pages }}
 {{ if gt $index 0}},{{end}} {
     "id": {{ $index }},
-    "href": "{{ $page.RelPermalink }}",
+    "href": ".{{ $page.RelPermalink }}",
     "title": {{ (partial "docs/title" $page) | jsonify }},
     "keywords": {{ if isset $page.Params "keywords" }}{{ delimit $page.Params.keywords ", " | jsonify }}{{else}}""{{end}}
 }

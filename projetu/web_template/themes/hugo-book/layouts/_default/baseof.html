@@ -3,6 +3,11 @@
 <head>
   {{ partial "docs/html-head" . }}
   {{ partial "docs/inject/head" . }}
+  <style>
+    h1 { 
+      page-break-before:avoid !important;
+    }
+  </style>
 </head>
 <body dir="{{ default "ltr" .Site.Language.LanguageDirection }}">
   <input type="checkbox" class="hidden toggle" id="menu-control" />
