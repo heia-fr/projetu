@@ -80,6 +80,12 @@ class Projetu:
                 if img.startswith("/"): img = img[1:]
                 if img.startswith("./"): img = img[2:]
                 self.img_to_copy.append(img)
+            m = re.search('src2=\"([^\"]*)\"',l)
+            if m is not None:
+                img = m.group(1)
+                if img.startswith("/"): img = img[1:]
+                if img.startswith("./"): img = img[2:]
+                self.img_to_copy.append(img)
             l = input_file.readline()
 
         if meta_map is None:
