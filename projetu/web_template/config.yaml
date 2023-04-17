@@ -1,0 +1,14 @@
+baseURL: 'http://example.org/'
+languageCode: en-us
+title: Projets de semestre 5
+relativeURLs: true
+uglyurls: true
+theme: hugo-book
+disableKinds:
+  - RSS
+  - sitemap
+permalinks:
+  posts: '/:filename/index_'
+taxonomies:
+  keyword: keywords
+  author: author

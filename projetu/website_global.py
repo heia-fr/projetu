@@ -12,6 +12,9 @@ import yaml
 import hashlib
 import shutil
 
+import yaml
+from yaml.loader import SafeLoader
+
 import click
 import gitlab
 
@@ -187,6 +190,13 @@ def cli(web_template_directory, config, gitlab_host, token, profs, project_type,
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
+
+    config_datas = []
+    with open(output_directory+'/config.yaml') as f:
+        config_datas = yaml.load(f, Loader=SafeLoader)
+    config_datas['title'] = ProjectType[project_type].value+' - '+academic_year
+    with open(output_directory+'/config.yaml', 'w') as f:
+        yaml.dump(config_datas, f)
     
     if tag is not None and tag.lower()=="none":
         tag=None

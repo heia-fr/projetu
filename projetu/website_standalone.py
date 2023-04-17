@@ -1,6 +1,10 @@
 import logging
 import os
 import shutil
+
+import yaml
+from yaml.loader import SafeLoader
+
 import click
 
 from . import Projetu,ProjectType
@@ -25,6 +29,13 @@ def cli(web_template_directory, author, config, project_type, academic_year, out
     
     shutil.copy(p.base_dir/"resources/redirect_index.html", "index.html")
     shutil.copytree(p.base_dir/web_template_directory, output_directory)
+
+    config_datas = []
+    with open(output_directory+'/config.yaml') as f:
+        config_datas = yaml.load(f, Loader=SafeLoader)
+    config_datas['title'] = ProjectType[project_type].value+' - '+academic_year
+    with open(output_directory+'/config.yaml', 'w') as f:
+        yaml.dump(config_datas, f)
 
     base_dir = os.getcwd()
     for i in input_files:
