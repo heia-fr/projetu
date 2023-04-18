@@ -6,7 +6,7 @@
         {{ if isset .Params "departments"}} <li>Filière(s): {{ delimit .Params.departments ", " }}</li> {{end}}
         {{ if isset .Params "orientations"}} <li>Orientation(s): {{ delimit .Params.orientations ", " }}</li> {{end}}
         {{ if isset .Params "instituts"}} <li>Instituts(s): {{ delimit .Params.instituts ", " }}</li> {{end}}
-        {{ if isset .Params "language"}} <li>Langue: {{ delimit .Params.language ", " }}</li> {{end}}
+        {{ if isset .Params "languages"}} <li>Langue(s): {{ delimit .Params.languages ", " }}</li> {{end}}
         {{ if isset .Params "max_students"}} <li>Nombre maximum d'étudiant(s): {{ .Params.max_students }}</li> {{end}}
         {{ if and (isset .Params "assigned_to") (not (eq .Params.assigned_to nil))}} <li>Attribué à: {{ delimit .Params.assigned_to ", " }}</li> {{end}}
         <li>Professeur: {{ .Params.author }}</li>
