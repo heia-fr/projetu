@@ -24,7 +24,7 @@ CONTEXT_SETTINGS = dict(
     auto_envvar_prefix='PROJETU'
 )
 
-def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year,output_directory,tag=None):
+def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_year,output_directory,tag=None,update_assignations=None):
     project_list = list()
     subgroups = group.subgroups.list(all=True)
     for sg in subgroups:
@@ -58,7 +58,11 @@ def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_
                 if len(path.parts) >= 2 and path.suffix == ".md" and path.name != "README.md":
                     with open(path) as f:
                         try:
-                            rendered_data,err = projetu.read_and_inject(f, path)
+                            key = str(path.parent) + path.stem
+                            update_assignation = None
+                            if update_assignations is not None and key in update_assignations:
+                                update_assignation = update_assignations[key]
+                            rendered_data,err = projetu.read_and_inject(f, path, update_assignation)
                             if err is not None:
                                 continue 
                         except Exception as e:
@@ -88,7 +92,7 @@ def get_projects_recursive(gitlab_instance, group, prof, project_type, academic_
     return project_list
 
 
-def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, output_directory, tag=None):
+def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, output_directory, tag=None, update_assignations=None):
     gl = gitlab.Gitlab(gitlab_host, private_token=token)
     project_list = list()
     main_group = gl.groups.get(3063)
@@ -102,7 +106,7 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
         if prof=="":
             logging.warn(f"No maintainer found for group: {subgroup.full_path}")
             continue
-        project_list+=get_projects_recursive(gl, subgroup, prof, project_type, academic_year, output_directory, tag)
+        project_list+=get_projects_recursive(gl, subgroup, prof, project_type, academic_year, output_directory, tag, update_assignations)
     return project_list
 
 
@@ -176,11 +180,11 @@ def build_from_cache(project_list, config):
 @click.option('--filter', 'project_filter', type=click.File(), default=None)
 @click.option('--debug/--no-debug')
 @click.option('--from-cache/--no-from-cache')
-@click.option('--update-assignation', 'updated_assignation', type=str, default=None)
+@click.option('--update-assignations', 'update_assignations', type=str, default=None)
 @click.option('--output-directory', 'output_directory', type=str, default="web")
 @click.option('--tag', type=str, default=None)
 @click.option('--secret',type=str, default="secret")
-def cli(web_template_directory, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag, updated_assignation,output_directory,secret):
+def cli(web_template_directory, config, gitlab_host, token, profs, project_type, academic_year, output, project_filter, debug, from_cache,tag, update_assignations,output_directory,secret):
     # copy website_template to a web dir in current directpry
     p = projetu = Projetu("",None)
     base_dir = p.base_dir
@@ -200,6 +204,19 @@ def cli(web_template_directory, config, gitlab_host, token, profs, project_type,
     
     if tag is not None and tag.lower()=="none":
         tag=None
+
+    update_assignations_datas = None
+    if update_assignations is not None:
+        logging.info("Update assignation not null")
+        with open(Path(update_assignations), "r") as csvfile:
+            reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            update_assignations_datas = {}
+            nb = 0
+            for r in reader:
+                nb+=1
+                if nb>2 and r[14]!="" and r[15]!="":
+                    logging.info("Add assignation to update")
+                    update_assignations_datas[r[0]+r[1]] = r[14]+" "+r[15]
     
     profs_list = None
     if profs is not None:
@@ -208,21 +225,13 @@ def cli(web_template_directory, config, gitlab_host, token, profs, project_type,
     if from_cache:
         with open(Path(output).with_suffix(".pickle"), "rb") as f:
             project_list = pickle.load(f)
-        if updated_assignation is None:
+        if update_assignations is None:
             build_from_cache(project_list, config)
         else:
-            with open(Path(updated_assignation), "r") as csvfile:
-                reader = csv.reader(csvfile, delimiter=',', quotechar='"')
-                updated_assignation_datas = {}
-                nb = 0
-                for r in reader:
-                    nb+=1
-                    if nb>2 and r[14]!="" and r[15]!="":
-                        updated_assignation_datas[r[0]+r[1]] = r[14]+" "+r[15]
-                project_list = build_expert_from_cache(project_list, config, updated_assignation=updated_assignation_datas)
+            project_list = build_expert_from_cache(project_list, config, updated_assignation=update_assignations_datas)
     else:
         project_list = build_from_git(
-            gitlab_host, token, project_type, academic_year, profs_list, output_directory, tag)
+            gitlab_host, token, project_type, academic_year, profs_list, output_directory, tag, update_assignations_datas)
         with open(Path(output).with_suffix(".pickle"), "wb") as f:
             pickle.dump(project_list, f)
 
@@ -345,7 +354,10 @@ def cli(web_template_directory, config, gitlab_host, token, profs, project_type,
                     "",
                     p['meta']['weight'] if "weight" in p['meta'] else "",
                 ])
-    url = hashlib.md5((project_type+academic_year+secret).encode()).hexdigest()[:10]
+    if update_assignations:
+        url = hashlib.md5((project_type+academic_year+secret+"updated").encode()).hexdigest()[:10]
+    else:
+        url = hashlib.md5((project_type+academic_year+secret).encode()).hexdigest()[:10]
     os.system("hugo -s web -d ../public/"+url)
     logging.info("URL: "+url)
     shutil.copy(base_dir/"resources/robots.txt", "public/robots.txt")

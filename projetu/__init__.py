@@ -46,10 +46,9 @@ class Projetu:
             Core(source_data=self.config_map, schema_files=[
                 str(self.base_dir/"schemas/config.yml")]).validate()
 
-    def read_and_inject(self, input_file, file_path, meta_map = None):
+    def read_and_inject(self, input_file, file_path, meta_map = None, update_assignation = None):
         meta = ""
         body = ""
-        injection = ""
         self.encoded_url = hashlib.md5(str(file_path).encode()).hexdigest()
         self.img_to_copy = []
 
@@ -116,6 +115,8 @@ class Projetu:
         meta_injected = data['meta']
         meta_injected['author'] = self.author
         meta_injected['showmeta'] = True
+        if update_assignation is not None:
+            meta_injected['assigned_to'] = update_assignation
         #meta_injected['url'] = "/"+self.encoded_url
 
         md_with_injection = MARK+"\n"+yaml.dump(meta_injected, allow_unicode=True)+MARK+"\n"+body
