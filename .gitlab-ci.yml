@@ -42,6 +42,7 @@ create-website:
   when: manual
   script: 
     - projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN --secret $SECRET
+    - if [ -z ${UPDATE_ASSIGNATIONS_FILE+x} ]; then echo "No assignation file set, build only classic"; else projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN --update-assignations $UPDATE_ASSIGNATIONS_FILE; fi
   artifacts:
     when: always
     paths:
@@ -55,6 +56,7 @@ pages:
   when: manual
   script: 
     - projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN
+    - if [ -z ${UPDATE_ASSIGNATIONS_FILE+x} ]; then echo "No assignation file set, build only classic"; else projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN --update-assignations $UPDATE_ASSIGNATIONS_FILE; fi
   artifacts:
     when: always
     paths:

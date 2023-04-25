@@ -51,19 +51,19 @@ class Projetu:
         body = ""
         self.encoded_url = hashlib.md5(str(file_path).encode()).hexdigest()
         self.img_to_copy = []
-
+        
         logger.debug("Building markdown for %s", input_file)
         l = input_file.readline()
         mark = l.strip()
         if not mark == MARK:
             raise Exception(f"Invalid header. The file must start with {MARK}")
-
+        
         meta = ""
         l = input_file.readline()
         while l != "" and l.strip() != mark:
             meta += l
             l = input_file.readline()
-
+        
         l = input_file.readline()
         while l != "":
             body += l
@@ -86,16 +86,14 @@ class Projetu:
                 if img.startswith("./"): img = img[2:]
                 self.img_to_copy.append(img)
             l = input_file.readline()
-
+        
         if meta_map is None:
             meta_map = yaml.load(meta, Loader=yaml.FullLoader)
-
         self.meta = meta_map
         if meta_map['version']<3:
             logger.warning(f"File {input_file.name} will be ignoring because it uses an older version of front matter.")
             return None,"Error"
         logger.debug(meta)
-
         schema_file = self.base_dir/f"schemas/meta_v{meta_map['version']}.yml"
         if not Path.exists(schema_file):
             raise Exception (f"Version {meta_map['version']} does not exist.")
@@ -111,7 +109,6 @@ class Projetu:
         data['author'] = self.author
         data['basedir'] = self.base_dir.resolve()
         data['body'] = body
-
         meta_injected = data['meta']
         meta_injected['author'] = self.author
         meta_injected['showmeta'] = True
