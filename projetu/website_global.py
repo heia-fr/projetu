@@ -129,7 +129,7 @@ def build_from_git(gitlab_host, token, project_type, academic_year, profs_list, 
 @click.option('--secret',type=str, default="secret")
 def cli(web_template_directory, config, gitlab_host, token, profs, project_type, academic_year, output, debug,tag, update_assignations,output_directory,secret):
     # copy website_template to a web dir in current directpry
-    p = projetu = Projetu("",None)
+    p = Projetu("",None)
     base_dir = p.base_dir
     shutil.copytree(base_dir/web_template_directory, output_directory)
 
@@ -255,6 +255,7 @@ def cli(web_template_directory, config, gitlab_host, token, profs, project_type,
     else:
         url = hashlib.md5((project_type+academic_year+secret).encode()).hexdigest()[:10]
     os.system("hugo -s web -d ../public/"+url)
+    os.system("rm -r web")
     logging.info("URL: "+url)
     shutil.copy(base_dir/"resources/robots.txt", "public/robots.txt")
 
