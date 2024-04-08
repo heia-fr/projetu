@@ -1,12 +1,12 @@
 variables:
   ACADEMIC_YEAR:
-    value: "2022/2023"
+    value: "2023/2024"
     description: "Academic year in form 'yyyy/yyyy'"
   DOC_NAME:
-    value: "booklet_ps6_2022-2023"
+    value: "booklet_tb_2023-2024"
     description: "Name of output documents (csv only)"
   PROJECT_TYPE:
-    value: "ps6"
+    value: "tb"
     description: "Type of project to build (ps5, ps6 or tb)"
   TAG:
     value: "none"
@@ -23,9 +23,9 @@ build-kaniko:
   only:
     - tags
   image:
-    name: 'gcr.io/kaniko-project/executor:debug'
+    name: "gcr.io/kaniko-project/executor:debug"
     entrypoint:
-      - ''
+      - ""
   script:
     - >-
       echo
@@ -40,7 +40,7 @@ create-website:
   image: "registry.forge.hefr.ch/isc/projetu:latest"
   stage: build
   when: manual
-  script: 
+  script:
     - projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN --secret $SECRET
     - if [ -z ${UPDATE_ASSIGNATIONS_FILE+x} ]; then echo "No assignation file set, build only classic"; else projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN --update-assignations $UPDATE_ASSIGNATIONS_FILE; fi
   artifacts:
@@ -54,7 +54,7 @@ pages:
   image: "registry.forge.hefr.ch/isc/projetu:latest"
   stage: build
   when: manual
-  script: 
+  script:
     - projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN
     - if [ -z ${UPDATE_ASSIGNATIONS_FILE+x} ]; then echo "No assignation file set, build only classic"; else projetu-website-global --template=web_template --type $PROJECT_TYPE --school-year $ACADEMIC_YEAR --output $DOC_NAME --tag $TAG --token $GITLAB_TOKEN --update-assignations $UPDATE_ASSIGNATIONS_FILE; fi
   artifacts:
@@ -62,7 +62,7 @@ pages:
     paths:
       - public
 
-tag-projects:    
+tag-projects:
   image: "registry.forge.hefr.ch/isc/projetu:latest"
   stage: build
   when: manual
