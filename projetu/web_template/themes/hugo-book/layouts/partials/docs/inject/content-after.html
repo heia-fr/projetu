@@ -5,15 +5,13 @@
         {{ if isset .Params "mandantors"}} <li>Mandant(s): {{ delimit .Params.mandantors ", " }}</li> {{end}}
         {{ if and (isset .Params "confidential") (eq .Params.confidential true) }} <li><b>Projet confidentiel</b></li>
         {{ end }}
-        {{ if and (isset .Params "nda_required") (eq .Params.nda_required true) }} <li><b>Signature d'un NDA requis</b>
-        </li> {{ end }}
+        {{ if and (isset .Params "nda_required") (eq .Params.nda_required true) }} <li><b>Signature d'un NDA requis</b></li> {{ end }}
         {{ if isset .Params "departments"}} <li>Filière(s): {{ delimit .Params.departments ", " }}</li> {{end}}
         {{ if isset .Params "orientations"}} <li>Orientation(s): {{ delimit .Params.orientations ", " }}</li> {{end}}
         {{ if isset .Params "instituts"}} <li>Instituts(s): {{ delimit .Params.instituts ", " }}</li> {{end}}
         {{ if isset .Params "languages"}} <li>Langue(s): {{ delimit .Params.languages ", " }}</li> {{end}}
         {{ if isset .Params "max_students"}} <li>Nombre maximum d'étudiant(s): {{ .Params.max_students }}</li> {{end}}
-        {{ if and (isset .Params "assigned_to") (not (eq .Params.assigned_to nil))}} <li>Attribué à: {{ delimit
-            .Params.assigned_to ", " }}</li> {{end}}
+        {{ if and (isset .Params "assigned_to") (not (eq .Params.assigned_to nil))}} <li>Attribué à: {{ delimit .Params.assigned_to ", " }}</li> {{end}}
         <li>Professeur: {{ .Params.author }}</li>
         {{ if isset .Params "professors"}} <li>Co-superviseur(s): {{ delimit .Params.professors ", " }}</li> {{end}}
         {{ if isset .Params "assistants"}} <li>Assistants: {{ delimit .Params.assistants ", " }}</li> {{end}}
