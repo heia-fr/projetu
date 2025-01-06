@@ -32,8 +32,6 @@ build-docker-image:
   before_script:
     - docker info
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  build:
-    stage: build
   script:
     - docker context create mycontext
     - docker context ls
