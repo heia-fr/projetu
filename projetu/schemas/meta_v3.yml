@@ -6,10 +6,10 @@ mapping:
   type:
     type: str
     enum:
-    - ps5
-    - ps6
-    - tb
-    - ignore
+      - ps5
+      - ps6
+      - tb
+      - ignore
     required: True
   academic_year:
     type: str
@@ -85,6 +85,9 @@ mapping:
   confidential:
     type: bool
     required: True
+  nda_required:
+    type: bool
+    required: False
   realized:
     type: str
     enum:
