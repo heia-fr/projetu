@@ -34,19 +34,19 @@ build-docker-image:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   build:
     stage: build
-    script:
-      - docker context create mycontext
-      - docker context ls
-      - docker buildx create --name mutliarch-builder --use mycontext
-      - docker buildx ls
-      - docker buildx inspect mutliarch-builder --bootstrap
-      - >
-        docker buildx build
-        --platform linux/amd64,linux/arm64,linux/arm/v7
-        --tag $IMAGE_TAG_SLUG
-        --tag $IMAGE_TAG_LATEST
-        --provenance false
-        --push .
+  script:
+    - docker context create mycontext
+    - docker context ls
+    - docker buildx create --name mutliarch-builder --use mycontext
+    - docker buildx ls
+    - docker buildx inspect mutliarch-builder --bootstrap
+    - >
+      docker buildx build
+      --platform linux/amd64,linux/arm64,linux/arm/v7
+      --tag $IMAGE_TAG_SLUG
+      --tag $IMAGE_TAG_LATEST
+      --provenance false
+      --push .
 
 create-website:
   image: "registry.forge.hefr.ch/isc/projetu:latest"
