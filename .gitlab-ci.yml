@@ -18,23 +18,35 @@ variables:
 stages:
   - build
 
-build-kaniko:
+build-docker-image:
   stage: build
   only:
     - tags
-  image:
-    name: "gcr.io/kaniko-project/executor:debug"
-    entrypoint:
-      - ""
-  script:
-    - >-
-      echo
-      "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}"
-      > /kaniko/.docker/config.json
-    - >-
-      /kaniko/executor --context $CI_PROJECT_DIR --dockerfile
-      $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-      --destination $CI_REGISTRY_IMAGE:latest
+  image: docker:27.0
+  services:
+    - docker:27.0-dind
+  variables:
+    IMAGE_TAG_SLUG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+    DOCKER_CLI_EXPERIMENTAL: enabled
+  before_script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  build:
+    stage: build
+    script:
+      - docker context create mycontext
+      - docker context ls
+      - docker buildx create --name mutliarch-builder --use mycontext
+      - docker buildx ls
+      - docker buildx inspect mutliarch-builder --bootstrap
+      - >
+        docker buildx build
+        --platform linux/amd64,linux/arm64,linux/arm/v7
+        --tag $IMAGE_TAG_SLUG
+        --tag $IMAGE_TAG_LATEST
+        --provenance false
+        --push .
 
 create-website:
   image: "registry.forge.hefr.ch/isc/projetu:latest"
